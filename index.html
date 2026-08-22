@@ -567,27 +567,28 @@ function ingest(raw, filename){
   S.meta.recorder = "识野AI纪要";
   S.meta.reporter = "";
 
-  const many = p.attendees.length > 6;
+  const many = p.attendees.length > 0;
   $("fileMeta").innerHTML = `
     <div class="meta-card">
       <div class="meta-grid">
-        <div><div class="k">来源</div><div class="v">${escapeHtml(S.transcriptFile)}</div></div>
+        <div><div class="k">来源</div><div class="v" title="${escapeHtml(S.transcriptFile)}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${escapeHtml(S.transcriptFile)}</div></div>
         <div><div class="k">参会人数</div><div class="v">${p.attendees.length} 人</div></div>
         <div><div class="k">会议日期</div><div class="v">${escapeHtml(S.meta.time)}</div></div>
         <div><div class="k">清洗字数</div><div class="v">${S.rawText.length}</div></div>
       </div>
-      <div class="chiprow" id="chiprow">${p.attendees.map(a=>`<span class="chip">${escapeHtml(a)}</span>`).join("")}</div>
-      ${many ? `<button class="chip-toggle" id="chipToggle">展开全部 ${p.attendees.length} 人 <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>` : ""}
+      <div class="chiprow" id="chiprow" style="display:none">${p.attendees.map(a=>`<span class="chip">${escapeHtml(a)}</span>`).join("")}</div>
+      ${many ? `<button class="chip-toggle" id="chipToggle">查看 ${p.attendees.length} 位参会人 <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>` : ""}
     </div>`;
   const toggle = $("chipToggle");
   if (toggle){
     toggle.onclick = () => {
       const row = $("chiprow");
-      const open = row.classList.toggle("expanded");
+      const open = row.style.display === "none";
+      row.style.display = open ? "flex" : "none";
       toggle.classList.toggle("open", open);
       toggle.innerHTML = open
-        ? `收起 <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`
-        : `展开全部 ${p.attendees.length} 人 <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`;
+        ? `收起参会人 <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`
+        : `查看 ${p.attendees.length} 位参会人 <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`;
     };
   }
   $("gotoGen").style.display = "block";
@@ -670,23 +671,23 @@ function buildPrompt(){
   const metaLine = `会议标题：${S.meta.title}\n日期：${S.meta.time}\n参会人：${S.meta.attendees.join("、")}\n`;
   return `你是会议纪要专业撰写助手。下面是「${S.meta.title}」的会议转录稿（已按发言人清洗）。请阅读后，仅输出一个 JSON 对象，不要任何其他文字、不要 markdown 代码块。
 
-JSON 结构：
+JSON 结构（**严格**）：
 {
   "title": "会议纪要标题（格式：渠道部周例会会议纪要0817 / XX会议纪要，标题里带日期）",
   "time": "会议时间（格式：YYYY年M月D日HH:MM-HH:MM，如 2026年8月17日14:00-17:00）",
-  "attendees": "参会人员（顿号分隔，去掉时间戳和重复）",
+  "attendees": "参会人员（**仅保留中文姓名，顿号分隔**。转录中 'Henry Liu(亨利)' 这类中英文混合格式，只保留括号内中文；不要保留英文名、公司后缀、机构名。如：朱世峰、潘勇超、刘红宇）",
   "absentees": "请假人（未提及写 无）",
   "content": "会议讨论内容要点及决议，格式严格如下：\\n1. 按议题分段，每段以中文数字开头「一、议题名」（顶格）\\n2. 议题下要点用阿拉伯数字「1、xxx」「2、xxx」（顶格，全角顿号）\\n3. 每点一句完整话，禁止用 ◆、-、• 符号\\n4. 语气正式书面，去除口语词\\n5. 保留关键数据、时间、规则\\n6. 议题之间不空行\\n7. 示例：\\n一、Q3促销政策解读\\n1、存储典配包下单门槛为2台起提\\n2、G8平台所有分销商须跟进签约\\n二、AI成果展示\\n1、全体参会人员逐一汇报",
   "todos": [
-    {"text":"具体待办事项，一句完整话","owner":"责任人姓名（多位用 / 分隔，如 片区经理/刘红宇）","due":"完成时间，格式 YYYY-MM-DD;未知写 待定"}
+    {"text":"具体待办事项，一句完整话","owner":"责任人姓名（仅保留中文姓名，多位用 / 分隔，如 片区经理/刘红宇）","due":"完成时间，格式 YYYY-MM-DD;未知写 待定"}
   ]
 }
 
-注意：
-- todos 必须是数组，1-12 条，只写有明确责任人的事项
+**关键要求（违反必错）：**
+- attendees 字段必须是「朱世峰、潘勇超」这种中文顿号分隔格式，**整个字段是一个字符串，不是数组**
+- todos 数组 1-12 条，只写有明确责任人的事项
 - 所有字段都是字符串，todos 是对象数组
-- content 字段中的换行用 \\n
-- 不要在 JSON 之外输出任何解释文字
+- content 字段中的换行用 \\n，不要在 JSON 之外输出任何解释文字
 
 ===== 会议信息 =====
 ${metaLine}
@@ -983,7 +984,9 @@ $("exportExcelBtn").onclick = async () => {
     ws.getRow(3).height = Math.max(18, calcLines(ws.getCell("B3").value, ['B','C','D','E']) * 14);
 
     ws.getCell("B4").value = S.meta.absentees;
-    ws.getCell("D4").value = "识野AI纪要";
+    const d4 = ws.getCell("D4");
+    d4.value = "识野AI纪要";
+    d4.alignment = { horizontal:'left', vertical:'center' };
     ws.getRow(4).height = 18;
 
     ws.getRow(5).height = 20;
@@ -1005,7 +1008,10 @@ $("exportExcelBtn").onclick = async () => {
       aCell.font = { name:'微软雅黑', size:10 };
       aCell.alignment = { horizontal:'center', vertical:'center', wrapText:true };
       ws.getCell(`B${row}`).value = t.text;
-      ws.getCell(`D${row}`).value = t.owner;
+      const dCell = ws.getCell(`D${row}`);
+      dCell.value = t.owner;
+      dCell.font = { name:'微软雅黑', size:10 };
+      dCell.alignment = { horizontal:'center', vertical:'center', wrapText:true };
       const due = parseDue(t.due);
       const eCell = ws.getCell(`E${row}`);
       if (due.isDate){
@@ -1040,6 +1046,8 @@ $("exportExcelBtn").onclick = async () => {
           cell.border = { top:thin, left:thin, bottom:thin, right:thin };
         });
         ws.getCell(`A${rowNum}`).numFmt = "0";
+        // 超 4 行补格式后，D 列同样给居中（与上方 todos.forEach 一致）
+        ws.getCell(`D${rowNum}`).alignment = { horizontal:'center', vertical:'center', wrapText:true };
         ws.mergeCells(`B${rowNum}:C${rowNum}`);
       }
     }
