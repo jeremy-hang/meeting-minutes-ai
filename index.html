@@ -231,14 +231,15 @@ footer a{color:var(--brand);text-decoration:none}
       <div id="paneApi">
         <label>API 提供商（点击快速填充）</label>
         <div class="api-preset">
+          <button class="preset-btn" data-preset='{"base":"https://api.icompify.com/v1","model":"deepseek-v4-flash"}'>积算平台</button>
           <button class="preset-btn" data-preset='{"base":"https://api.deepseek.com/v1","model":"deepseek-chat"}'>DeepSeek</button>
           <button class="preset-btn" data-preset='{"base":"https://dashscope.aliyuncs.com/compatible-mode/v1","model":"qwen-plus"}'>通义千问</button>
           <button class="preset-btn" data-preset='{"base":"https://api.moonshot.cn/v1","model":"kimi-k2-0711-preview"}'>Kimi</button>
           <button class="preset-btn" data-preset='{"base":"https://api.openai.com/v1","model":"gpt-4o-mini"}'>OpenAI</button>
           <button class="preset-btn" data-preset='{"base":"https://open.bigmodel.cn/api/paas/v4","model":"glm-4-flash"}'>智谱</button>
         </div>
-        <label>API 地址</label>
-        <input type="text" id="apiBase" placeholder="https://api.deepseek.com/v1">
+        <label>API 地址<span class="small">（支持 base 或完整 /chat/completions 均可）</span></label>
+        <input type="text" id="apiBase" placeholder="https://api.icompify.com/v1 或 .../chat/completions">
         <label>API Key</label>
         <input type="password" id="apiKey" placeholder="sk-...">
         <label>模型名</label>
@@ -565,17 +566,26 @@ $("editToggle").onclick = () => {
 };
 
 /* ==================== API 直连 ==================== */
+function resolveApiUrl(input){
+  // 智能识别：输入可以是 https://host/v1 或 https://host/v1/chat/completions
+  const u = input.replace(/\/+$/,"");
+  if (/\/chat\/completions$/i.test(u)) return u;
+  return u + "/chat/completions";
+}
+
 $("apiGenBtn").onclick = async () => {
   const st = $("apiStatus");
   if (!S.rawText){ st.className="status err"; st.textContent="先导入转录稿"; return; }
-  const base = $("apiBase").value.trim().replace(/\/+$/,"");
+  const base = $("apiBase").value.trim();
   const key = $("apiKey").value.trim();
   const model = $("apiModel").value.trim();
   if (!base || !key || !model){ st.className="status err"; st.textContent="请填全 API 配置"; return; }
+  const url = resolveApiUrl(base);
   st.className="status ok"; st.innerHTML='<span class="spin"></span> 调用中…';
   $("apiGenBtn").disabled = true;
+  console.log("[api] POST", url, "model:", model);
   try {
-    const resp = await fetch(base + "/chat/completions", {
+    const resp = await fetch(url, {
       method: "POST",
       headers: { "Content-Type":"application/json", "Authorization":"Bearer " + key },
       body: JSON.stringify({
@@ -613,12 +623,14 @@ function b64ToBuf(b64){
 }
 function calcLines(text, colSpan){
   const total = colSpan.reduce((s,c)=>s + (COL_WIDTHS[c]||20), 0);
+  // Excel 列宽单位是「0 字符数」，汉字宽度 ≈ 2 倍
+  const charsPerLine = total / 2;
   const lines = String(text||"").split("\n");
   let n = 0;
   for (const ln of lines){
     let w = 0;
     for (const ch of ln){ w += ch.charCodeAt(0) > 127 ? 1 : 0.55; }
-    n += Math.max(1, Math.ceil(w / Math.max(1, total * 0.92)));
+    n += Math.max(1, Math.ceil(w / Math.max(1, charsPerLine)));
   }
   return n;
 }
@@ -664,20 +676,12 @@ $("exportExcelBtn").onclick = async () => {
     // R5 节标
     ws.getRow(5).height = 20;
 
-    // R6 内容：富文本议题标题加粗
-    const lines = S.content.split("\n");
-    const richText = [];
-    lines.forEach((ln, idx) => {
-      const isTopic = /^[一二三四五六七八九十]、/.test(ln);
-      // ExcelJS rich text 项
-      richText.push({
-        font: { name:'微软雅黑', size:10, bold: true },  // 真人版 cell 整体 bold
-        text: ln + (idx < lines.length - 1 ? "\n" : "")
-      });
-    });
-    // 议题标题再加强（虽然 cell 已 bold，但 rich text 层级需要）
-    ws.getCell("A6").value = { richText };
-    ws.getRow(6).height = Math.min(500, Math.max(80, calcLines(S.content, ['A','B','C','D','E']) * 12.5 + 20));
+    // R6 内容：纯字符串；议题标题行在 preview 加粗
+    ws.getCell("A6").value = S.content;
+    ws.getCell("A6").font = { name:'微软雅黑', size:10, bold:false };
+    // 行高：12pt/行（对标真人版 11.3pt/行）+ 4pt padding
+    const lineCount = calcLines(S.content, ['A','B','C','D','E']);
+    ws.getRow(6).height = Math.min(450, Math.max(60, lineCount * 12 + 4));
 
     // R7 待办表头
     ws.getRow(7).height = 20;
