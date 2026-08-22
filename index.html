@@ -823,8 +823,9 @@ $("exportExcelBtn").onclick = async () => {
     todos.forEach((t,i)=>{
       const row = 8 + i;
       const aCell = ws.getCell(`A${row}`);
+      aCell.value = null;           // 清空类型：模板继承的 datetime 不能直接覆盖
+      aCell.numFmt = "0";
       aCell.value = i+1;
-      aCell.numFmt = "0";           // 修复：避免继承日期格式
       aCell.font = { name:'微软雅黑', size:10 };
       aCell.alignment = { horizontal:'center', vertical:'center', wrapText:true };
       ws.getCell(`B${row}`).value = t.text;
@@ -844,8 +845,9 @@ $("exportExcelBtn").onclick = async () => {
     });
     for (let i=todos.length; i<4; i++){
       const aCell = ws.getCell(`A${8+i}`);
-      aCell.value = i+1;
+      aCell.value = null;
       aCell.numFmt = "0";
+      aCell.value = i+1;
       ws.getRow(8+i).height = 18;
     }
     // 超过 4 行补格式
@@ -862,8 +864,8 @@ $("exportExcelBtn").onclick = async () => {
           };
           cell.border = { top:thin, left:thin, bottom:thin, right:thin };
         });
-        ws.mergeCells(`B${rowNum}:C${rowNum}`);
         ws.getCell(`A${rowNum}`).numFmt = "0";
+        ws.mergeCells(`B${rowNum}:C${rowNum}`);
       }
     }
 
