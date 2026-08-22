@@ -9,125 +9,124 @@
 <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 <style>
 :root{
-  --bg:#0f131a;
-  --bg-elev:#161c26;
-  --bg-card:#1a212e;
-  --bg-hover:#222b3a;
-  --border:#2a3444;
-  --border-strong:#3a4556;
-  --text:#e6eaf2;
-  --text-2:#b8c0d0;
-  --text-3:#7a8499;
-  --text-mute:#566074;
-  --brand:#14b8a6;
-  --brand-strong:#0d9488;
-  --brand-soft:rgba(20,184,166,.12);
-  --brand-glow:rgba(20,184,166,.25);
-  --ok:#10b981;
-  --warn:#f59e0b;
-  --err:#ef4444;
-  --radius:10px;
-  --radius-sm:6px;
-  --radius-lg:14px;
-  --shadow-sm:0 1px 2px rgba(0,0,0,.3);
-  --shadow:0 4px 12px rgba(0,0,0,.35);
-  --shadow-lg:0 12px 32px rgba(0,0,0,.45);
+  --bg:#f5f5f7;
+  --bg-elev:#ffffff;
+  --bg-card:#ffffff;
+  --bg-hover:#f5f5f7;
+  --border:#d2d2d7;
+  --border-strong:#aeaeb2;
+  --text:#1d1d1f;
+  --text-2:#6e6e73;
+  --text-3:#86868b;
+  --text-mute:#aeaeb2;
+  --brand:#0071e3;
+  --brand-strong:#0066cc;
+  --brand-soft:rgba(0,113,227,.08);
+  --brand-glow:rgba(0,113,227,.18);
+  --ok:#34c759;
+  --warn:#ff9500;
+  --err:#ff3b30;
+  --radius:12px;
+  --radius-sm:8px;
+  --radius-lg:18px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.04);
+  --shadow:0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{color-scheme:dark}
+html{color-scheme:light}
 body{
-  font-family:'Inter','PingFang SC','Microsoft YaHei',-apple-system,sans-serif;
-  background:var(--bg); color:var(--text); line-height:1.6;
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC','Helvetica Neue','Microsoft YaHei',sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.5;
   -webkit-font-smoothing:antialiased;
   min-height:100vh;
 }
-::selection{background:var(--brand);color:#04251f}
+::selection{background:var(--brand);color:#fff}
 
 /* ============ Top Nav ============ */
 .topbar{
-  background:linear-gradient(180deg, rgba(20,184,166,.06), transparent);
+  background:rgba(251,251,253,.82);
   border-bottom:1px solid var(--border);
-  padding:0 32px;
+  padding:0 40px;
   position:sticky;top:0;z-index:10;
-  backdrop-filter:blur(12px);
-  background-color:rgba(15,19,26,.85);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
 }
 .topbar-inner{
   max-width:1480px;margin:0 auto;
   display:flex;align-items:center;gap:24px;
-  height:60px;
+  height:56px;
 }
 .logo-mark{
-  width:28px;height:28px;flex:none;
+  width:26px;height:26px;flex:none;
   background:linear-gradient(135deg,var(--brand),var(--brand-strong));
   border-radius:7px;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 20px var(--brand-glow);
+  box-shadow:0 2px 8px var(--brand-glow);
 }
-.logo-mark svg{width:16px;height:16px;stroke:#04251f;stroke-width:2.5;fill:none}
+.logo-mark svg{width:14px;height:14px;stroke:#fff;stroke-width:2.5;fill:none}
 .topbar .brand-name{
-  font-size:15px;font-weight:600;letter-spacing:.2px;
-  display:flex;align-items:center;gap:8px;
+  font-size:15px;font-weight:600;letter-spacing:-.01em;color:var(--text);
+  display:flex;align-items:center;gap:10px;
 }
 .topbar .brand-tag{
-  font-size:12px;color:var(--text-3);font-weight:400;
-  border-left:1px solid var(--border);padding-left:12px;margin-left:4px;
+  font-size:12px;color:var(--text-2);font-weight:400;
+  border-left:1px solid var(--border);padding-left:12px;margin-left:2px;
 }
 .topbar .spacer{flex:1}
 .by-credit{
-  font-size:11px;color:var(--text-mute);letter-spacing:.5px;font-weight:500;
-  padding:3px 10px;border:1px solid var(--border);border-radius:99px;
-  background:rgba(255,255,255,.02);
+  font-size:12px;color:var(--text-2);letter-spacing:.01em;font-weight:400;
 }
 
 /* ============ Layout ============ */
 .layout{
-  display:grid;grid-template-columns:420px 1fr;gap:20px;
-  padding:20px 32px 40px;
+  display:grid;grid-template-columns:400px 1fr;gap:24px;
+  padding:32px 40px 56px;
   max-width:1480px;margin:0 auto;
 }
-@media (max-width:1100px){ .layout{grid-template-columns:1fr;padding:16px} }
+@media (max-width:1100px){ .layout{grid-template-columns:1fr;padding:20px} }
 
 /* ============ Panel ============ */
 .panel{
   background:var(--bg-card);
   border:1px solid var(--border);
   border-radius:var(--radius-lg);
-  padding:20px;
+  padding:24px;
+  box-shadow:var(--shadow);
 }
-.panel + .panel{margin-top:16px}
+.panel + .panel{margin-top:20px}
 .panel h2{
-  font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--text-3);
+  font-size:13px;font-weight:600;letter-spacing:-.01em;
+  color:var(--text);
   display:flex;align-items:center;gap:10px;
-  margin-bottom:16px;
+  margin-bottom:18px;
 }
 .panel h2 .step{
-  width:20px;height:20px;border-radius:5px;
+  width:22px;height:22px;border-radius:7px;
   background:var(--brand-soft);color:var(--brand);
-  font-size:11px;font-weight:700;
+  font-size:11px;font-weight:600;
   display:inline-flex;align-items:center;justify-content:center;
 }
 .panel h2 .hint{
-  margin-left:auto;font-size:11px;font-weight:400;letter-spacing:0;
-  text-transform:none;color:var(--text-mute);
+  margin-left:auto;font-size:12px;font-weight:400;letter-spacing:0;
+  color:var(--text-3);
 }
 
 /* ============ Form ============ */
 label{
-  display:block;font-size:11px;font-weight:500;color:var(--text-3);
-  margin:14px 0 6px;letter-spacing:.3px;text-transform:uppercase;
+  display:block;font-size:12px;font-weight:500;color:var(--text-2);
+  margin:16px 0 6px;letter-spacing:-.01em;
 }
 input[type=text],input[type=password],select,textarea{
-  width:100%;padding:9px 12px;border:1px solid var(--border);
-  border-radius:var(--radius-sm);font-size:13px;font-family:inherit;
+  width:100%;padding:10px 12px;border:1px solid var(--border);
+  border-radius:var(--radius-sm);font-size:14px;font-family:inherit;
   background:var(--bg-elev);color:var(--text);
   transition:border-color .15s, box-shadow .15s;
 }
 input:hover,textarea:hover{border-color:var(--border-strong)}
 input:focus,textarea:focus,select:focus{
   outline:none;border-color:var(--brand);
-  box-shadow:0 0 0 3px var(--brand-soft);
+  box-shadow:0 0 0 4px var(--brand-soft);
 }
 textarea{resize:vertical;min-height:80px}
 input::placeholder,textarea::placeholder{color:var(--text-mute)}
@@ -135,98 +134,125 @@ input::placeholder,textarea::placeholder{color:var(--text-mute)}
 /* ============ Buttons ============ */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:8px 16px;border:none;border-radius:var(--radius-sm);font-size:13px;
+  padding:9px 18px;border:none;border-radius:980px;font-size:14px;
   cursor:pointer;font-family:inherit;font-weight:500;
   transition:all .15s;
   border:1px solid transparent;
+  letter-spacing:-.01em;
 }
 .btn-primary{
-  background:var(--brand);color:#04251f;
-  font-weight:600;
-  box-shadow:0 0 12px var(--brand-glow);
+  background:var(--brand);color:#fff;
+  font-weight:500;
+  box-shadow:0 2px 8px var(--brand-glow);
 }
 .btn-primary:hover:not(:disabled){
-  background:#1dd6c1;transform:translateY(-1px);
-  box-shadow:0 0 24px var(--brand-glow);
+  background:#0077ed;transform:scale(1.01);
+  box-shadow:0 4px 14px var(--brand-glow);
 }
+.btn-primary:active:not(:disabled){transform:scale(.98)}
 .btn-primary:disabled{
-  background:rgba(20,184,166,.25);color:var(--text-mute);
+  background:rgba(0,113,227,.3);color:rgba(255,255,255,.8);
   cursor:not-allowed;box-shadow:none;transform:none;
 }
 .btn-ghost{
-  background:transparent;border-color:var(--border);color:var(--text-2);
+  background:var(--bg-elev);border-color:var(--border);color:var(--brand);
+  box-shadow:var(--shadow-sm);
 }
-.btn-ghost:hover{border-color:var(--brand);color:var(--brand)}
+.btn-ghost:hover{border-color:var(--brand);background:var(--brand-soft)}
 .btn-ok{
-  background:var(--ok);color:#01170f;font-weight:600;
+  background:var(--ok);color:#fff;font-weight:500;
+  box-shadow:0 2px 8px rgba(52,199,89,.25);
 }
-.btn-ok:hover:not(:disabled){background:#1ed19a;transform:translateY(-1px)}
+.btn-ok:hover:not(:disabled){background:#30d158;transform:scale(1.01)}
+.btn-ok:disabled{background:rgba(52,199,89,.3);color:rgba(255,255,255,.8);cursor:not-allowed;box-shadow:none;transform:none}
 .btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;flex:none}
 
 /* ============ Dropzone ============ */
 .dropzone{
   border:1.5px dashed var(--border);border-radius:var(--radius);
-  padding:32px 16px;text-align:center;color:var(--text-3);
-  font-size:13px;cursor:pointer;transition:all .2s;
-  background:var(--bg-elev);
+  padding:36px 16px;text-align:center;color:var(--text-3);
+  font-size:14px;cursor:pointer;transition:all .2s;
+  background:var(--bg);
 }
 .dropzone:hover,.dropzone.over{
   border-color:var(--brand);color:var(--brand);
   background:var(--brand-soft);
 }
 .dropzone .dz-icon{
-  width:36px;height:36px;margin:0 auto 8px;opacity:.6;
+  width:40px;height:40px;margin:0 auto 10px;opacity:.5;
 }
 .dropzone .dz-icon svg{width:100%;height:100%;stroke:currentColor;stroke-width:1.5;fill:none}
 
 /* ============ Meta Card ============ */
 .meta-card{
-  background:var(--bg-elev);
+  background:var(--bg);
   border:1px solid var(--border);
-  border-radius:var(--radius);padding:14px;margin-top:14px;
+  border-radius:var(--radius);padding:16px;margin-top:16px;
 }
-.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px}
-.meta-grid .k{color:var(--text-3);font-size:10px;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:13px}
+.meta-grid .k{color:var(--text-3);font-size:11px;letter-spacing:.01em;margin-bottom:3px}
 .meta-grid .v{font-weight:600;color:var(--text)}
-.chiprow{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.chiprow{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .chip{
-  background:var(--bg-hover);border:1px solid var(--border);
-  border-radius:99px;padding:2px 10px;font-size:11px;color:var(--text-2);
+  background:var(--bg-elev);border:1px solid var(--border);
+  border-radius:99px;padding:3px 12px;font-size:12px;color:var(--text-2);
 }
 
 /* ============ Tabs ============ */
 .tabs{
-  display:flex;background:var(--bg-elev);border-radius:var(--radius-sm);
-  padding:3px;gap:2px;font-size:12px;
+  display:flex;background:var(--bg);border-radius:980px;
+  padding:4px;gap:2px;font-size:13px;
   border:1px solid var(--border);
 }
 .tabs div{
-  flex:1;text-align:center;padding:7px 0;cursor:pointer;
-  color:var(--text-3);border-radius:4px;font-weight:500;transition:.15s;
+  flex:1;text-align:center;padding:8px 0;cursor:pointer;
+  color:var(--text-2);border-radius:980px;font-weight:500;transition:.15s;
 }
 .tabs div:hover{color:var(--text)}
-.tabs div.on{background:var(--bg-hover);color:var(--brand);font-weight:600;box-shadow:var(--shadow-sm)}
+.tabs div.on{background:var(--bg-elev);color:var(--brand);font-weight:600;box-shadow:var(--shadow-sm)}
+
+/* ============ Proxy Pills ============ */
+.proxy-tabs{
+  display:flex;background:var(--bg);border-radius:var(--radius-sm);
+  padding:3px;gap:2px;font-size:12px;
+  border:1px solid var(--border);
+}
+.proxy-tabs div{
+  flex:1;text-align:center;padding:7px 8px;cursor:pointer;
+  color:var(--text-2);border-radius:6px;font-weight:500;transition:.15s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.proxy-tabs div:hover{color:var(--text)}
+.proxy-tabs div.on{background:var(--bg-elev);color:var(--brand);font-weight:600;box-shadow:var(--shadow-sm)}
+.proxy-tabs .rec-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--ok);flex:none;
+}
+.proxy-note{
+  font-size:11px;color:var(--text-3);line-height:1.6;margin-top:10px;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:10px 12px;
+}
 
 /* ============ Presets ============ */
 .api-preset{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .preset-btn{
-  font-size:11px;padding:5px 12px;background:var(--bg-elev);
+  font-size:12px;padding:6px 14px;background:var(--bg);
   color:var(--text-2);border:1px solid var(--border);
   border-radius:99px;cursor:pointer;font-family:inherit;font-weight:500;
   transition:all .15s;
 }
 .preset-btn:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
-.preset-btn.active{background:var(--brand);color:#04251f;border-color:var(--brand);font-weight:600}
+.preset-btn.active{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:600}
 
 /* ============ Status ============ */
 .status{font-size:12px;min-height:18px;display:inline-flex;align-items:center;gap:6px}
-.status.ok{color:var(--ok)}
-.status.err{color:var(--err)}
-.status.warn{color:var(--warn)}
+.status.ok{color:#248a3d}
+.status.err{color:#d70015}
+.status.warn{color:#c93400}
 .spin{
   display:inline-block;width:12px;height:12px;
-  border:2px solid rgba(255,255,255,.15);
-  border-top-color:currentColor;border-radius:50%;
+  border:2px solid rgba(0,113,227,.15);
+  border-top-color:var(--brand);border-radius:50%;
   animation:s .7s linear infinite;vertical-align:-2px;
 }
 @keyframes s{to{transform:rotate(360deg)}}
@@ -235,84 +261,88 @@ input::placeholder,textarea::placeholder{color:var(--text-mute)}
 #resultFrame{width:100%;overflow:auto}
 table.mtable{
   border-collapse:collapse;width:100%;font-size:13px;background:#fff;
-  border:1px solid #d1d5db;color:#000;
+  border:1px solid #d2d2d7;color:#1d1d1f;
 }
 table.mtable td,table.mtable th{
-  border:1px solid #d1d5db;padding:8px 10px;vertical-align:middle;
+  border:1px solid #d2d2d7;padding:8px 10px;vertical-align:middle;
 }
 table.mtable .tcell{
-  background:#c0c0c0;font-weight:700;white-space:nowrap;
-  font-size:12px;color:#000;text-align:left;
+  background:#e8e8ed;font-weight:600;white-space:nowrap;
+  font-size:12px;color:#1d1d1f;text-align:left;
 }
 .titlecell{
-  text-align:center;font-size:16px;font-weight:700;padding:14px!important;
-  letter-spacing:2px;background:#c0c0c0!important;color:#000;
+  text-align:center;font-size:17px;font-weight:700;padding:16px!important;
+  letter-spacing:2px;background:#e8e8ed!important;color:#1d1d1f;
 }
 .content-body{
-  white-space:pre-wrap;font-size:13px;line-height:1.85;color:#000;
+  white-space:pre-wrap;font-size:13px;line-height:1.85;color:#1d1d1f;
 }
 .content-body .topic{font-weight:700;display:block;margin-top:8px}
 .content-body .topic:first-child{margin-top:0}
 [contenteditable="true"]{
   outline:2px dashed var(--brand);outline-offset:1px;cursor:text;
-  background:#fffef5;
+  background:#f0f7ff;
 }
 .todo-add{
-  font-size:12px;margin-top:8px;cursor:pointer;color:var(--brand);
+  font-size:13px;margin-top:10px;cursor:pointer;color:var(--brand);
   background:none;border:none;padding:0;font-family:inherit;
-  display:inline-flex;align-items:center;gap:4px;
+  display:inline-flex;align-items:center;gap:4px;font-weight:500;
 }
 .todo-add:hover{text-decoration:underline}
 
 /* ============ Empty state ============ */
 .empty-state{
-  text-align:center;padding:80px 20px;color:var(--text-mute);
+  text-align:center;padding:90px 20px;color:var(--text-mute);
 }
 .empty-state .icon{
-  width:56px;height:56px;margin:0 auto 14px;opacity:.3;
+  width:60px;height:60px;margin:0 auto 16px;opacity:.25;
 }
-.empty-state .icon svg{width:100%;height:100%;stroke:currentColor;stroke-width:1.5;fill:none}
-.empty-state .title{font-size:14px;color:var(--text-3);margin-bottom:4px}
-.empty-state .desc{font-size:12px}
+.empty-state .icon svg{width:100%;height:100%;stroke:currentColor;stroke-width:1.2;fill:none}
+.empty-state .title{font-size:15px;color:var(--text-2);margin-bottom:4px;font-weight:500}
+.empty-state .desc{font-size:13px;color:var(--text-3)}
 
 /* ============ Footer actions ============ */
 .footer-actions{
   display:flex;gap:10px;justify-content:flex-end;
-  margin-top:18px;align-items:center;
+  margin-top:20px;align-items:center;
 }
 .footer-actions .spacer{margin-right:auto}
 
 /* ============ Modal ============ */
 .modal-mask{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;
+  position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;
   align-items:center;justify-content:center;z-index:50;
-  backdrop-filter:blur(6px);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
 }
 .modal{
   background:var(--bg-card);border:1px solid var(--border);
-  border-radius:var(--radius-lg);padding:24px;width:680px;max-width:92vw;
+  border-radius:var(--radius-lg);padding:28px;width:720px;max-width:92vw;
   max-height:85vh;overflow:auto;box-shadow:var(--shadow-lg);
+  display:flex;flex-direction:column;max-width:92vw;
 }
 .modal h3{
-  font-size:15px;margin-bottom:8px;font-weight:600;color:var(--text);
-  display:flex;align-items:center;gap:8px;
+  font-size:17px;margin-bottom:6px;font-weight:600;color:var(--text);
+  letter-spacing:-.01em;
 }
-.modal .close-row{display:flex;justify-content:flex-end;margin-top:16px}
+.modal .close-row{display:flex;justify-content:flex-end;margin-top:18px}
 pre.hint{
-  background:#0a0d12;color:#a8b3c2;padding:14px;border-radius:var(--radius-sm);
+  background:var(--bg);color:var(--text);padding:16px;border-radius:var(--radius-sm);
   font-size:12px;overflow:auto;white-space:pre-wrap;max-height:340px;line-height:1.6;
-  font-family:'JetBrains Mono','SF Mono',Monaco,Consolas,monospace;
+  font-family:'SF Mono','JetBrains Mono',Monaco,Consolas,monospace;
   border:1px solid var(--border);
+  flex:1;
 }
 
 /* ============ Footer ============ */
 footer{
-  text-align:center;padding:24px;font-size:12px;color:var(--text-mute);
+  text-align:center;padding:32px;font-size:12px;color:var(--text-3);
   border-top:1px solid var(--border);
-  margin-top:20px;
+  margin-top:24px;
+  background:rgba(251,251,253,.5);
 }
 footer .sig{
-  font-family:'JetBrains Mono',monospace;letter-spacing:1px;
+  letter-spacing:.01em;
 }
 </style>
 </head>
@@ -339,13 +369,13 @@ footer .sig{
           <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
         </div>
         点击选择 或 拖入 .txt 文件<br>
-        <span style="font-size:11px;color:var(--text-mute)">支持腾讯会议 GMT 格式转录</span>
+        <span style="font-size:12px;color:var(--text-mute)">支持腾讯会议 GMT 格式转录</span>
       </div>
       <input type="file" id="fileInput" accept=".txt" style="display:none">
       <div id="fileMeta"></div>
       <label>或粘贴转录文本</label>
       <textarea id="pasteArea" placeholder="直接粘贴转录文字…"></textarea>
-      <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px">
+      <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px">
         <span class="status" id="parseStatus"></span>
         <button class="btn btn-ghost" id="usePasteBtn">使用粘贴内容</button>
       </div>
@@ -374,21 +404,34 @@ footer .sig{
         <input type="password" id="apiKey" placeholder="sk-…">
         <label>模型名</label>
         <input type="text" id="apiModel" placeholder="deepseek-v4-flash">
-        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:16px">
+
+        <label>连接方式</label>
+        <div class="proxy-tabs">
+          <div id="proxyAuto" class="on"><span class="rec-dot"></span>自动回退</div>
+          <div id="proxyDirect">直连</div>
+          <div id="proxyCors">代理中转</div>
+        </div>
+        <div class="proxy-note">
+          <strong>自动回退</strong>：先直连，被浏览器拦截后走公共 CORS 代理（Key 会经第三方）。<br>
+          <strong>直连</strong>：最快，但部分 API 服务器不支持浏览器调用<br>
+          <strong>代理中转</strong>：绕过浏览器限制，公共代理可绕过跨域
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:20px">
           <span class="status" id="apiStatus"></span>
           <button class="btn btn-primary" id="apiGenBtn">
             <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
             生成纪要
           </button>
         </div>
-        <div style="margin-top:10px;font-size:11px;color:var(--text-mute);display:flex;align-items:center;gap:6px">
+        <div style="margin-top:12px;font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:6px">
           <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;flex:none"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          Key 仅存在浏览器 localStorage，不会外发
+          Key 仅存浏览器本地，不会外发（自动回退模式下会经公共代理）
         </div>
       </div>
 
       <div id="panePaste" style="display:none">
-        <div style="background:var(--brand-soft);border:1px solid var(--brand);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--brand-strong);margin-top:12px;line-height:1.8">
+        <div style="background:var(--brand-soft);border:1px solid var(--brand);border-radius:var(--radius-sm);padding:14px;font-size:13px;color:var(--brand-strong);margin-top:14px;line-height:1.8">
           1. 点「生成提取指令」复制 prompt<br>
           2. 发给任意 AI（ChatGPT · 豆包 · Kimi · DeepSeek…）<br>
           3. 把返回的 JSON 粘贴回下面
@@ -399,7 +442,7 @@ footer .sig{
         </div>
         <label>粘贴 AI 返回的 JSON</label>
         <textarea id="jsonInput" placeholder='{"title":"…","content":"…","todos":[…]}'></textarea>
-        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px">
+        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px">
           <span class="status" id="jsonStatus"></span>
           <button class="btn btn-primary" id="applyJsonBtn">应用并生成预览</button>
         </div>
@@ -433,14 +476,14 @@ footer .sig{
 </div>
 
 <footer>
-  <span class="sig">by 识野Insight · Crafted with care</span>
+  <span class="sig">by 识野Insight</span>
 </footer>
 
 <!-- 指令弹窗 -->
 <div class="modal-mask" id="promptModal">
   <div class="modal">
     <h3>提取指令已复制到剪贴板</h3>
-    <div style="font-size:12px;color:var(--text-3);margin-bottom:12px">把下面整段发给任意 AI，把返回 JSON 粘贴回左侧输入框即可</div>
+    <div style="font-size:12px;color:var(--text-2);margin-bottom:14px">把下面整段发给任意 AI，把返回 JSON 粘贴回左侧输入框即可</div>
     <pre class="hint" id="promptText"></pre>
     <div class="close-row">
       <button class="btn btn-primary" id="closeModalBtn">关闭</button>
@@ -543,6 +586,20 @@ function switchTab(which){
   $("paneApi").style.display = which==="api" ? "" : "none";
   $("panePaste").style.display = which==="paste" ? "" : "none";
 }
+
+/* ==================== Proxy Tabs ==================== */
+let proxyMode = LS("proxyMode") || "auto";
+function setProxyTab(m){
+  proxyMode = m;
+  setLS("proxyMode", m);
+  $("proxyAuto").className = m==="auto" ? "on" : "";
+  $("proxyDirect").className = m==="direct" ? "on" : "";
+  $("proxyCors").className = m==="cors" ? "on" : "";
+}
+$("proxyAuto").onclick = () => setProxyTab("auto");
+$("proxyDirect").onclick = () => setProxyTab("direct");
+$("proxyCors").onclick = () => setProxyTab("cors");
+setProxyTab(proxyMode);
 
 /* preset 按钮 */
 document.querySelectorAll(".preset-btn").forEach(btn=>{
@@ -677,7 +734,7 @@ function renderResult(){
         <td class="tcell">纪要人（Recorder）</td>
         <td colspan="2">${escapeHtml(S.meta.recorder)}</td>
       </tr>
-      <tr><td colspan="5" class="tcell" style="background:#c0c0c0;font-weight:700">会议讨论内容要点及决议</td></tr>
+      <tr><td colspan="5" class="tcell" style="background:#e8e8ed;font-weight:700">会议讨论内容要点及决议</td></tr>
       <tr><td colspan="5" class="content-body" contenteditable="${S.editMode}" id="contentCell">${contentHtml}</td></tr>
       <tr>
         <td class="tcell" style="text-align:center;width:48px">No.</td>
@@ -717,6 +774,56 @@ function resolveApiUrl(input){
   return u + "/chat/completions";
 }
 
+const CORS_PROXIES = [
+  (u) => "https://corsproxy.io/?url=" + encodeURIComponent(u),
+  (u) => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u),
+  (u) => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u),
+];
+
+function isCorsErr(e){
+  const s = String(e).toLowerCase();
+  return !s.includes("http ") &&
+    (s.includes("failed to fetch") || s.includes("networkerror") || s.includes("load failed"));
+}
+
+async function doFetch(url, payload, key){
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type":"application/json", "Authorization":"Bearer " + key },
+    body: JSON.stringify(payload)
+  });
+  const text = await resp.text();
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${text.slice(0,200)}`);
+  let j;
+  try { j = JSON.parse(text); } catch { throw new Error("响应不是 JSON: " + text.slice(0,200)); }
+  return j;
+}
+
+async function apiCallWithProxy(directUrl, payload, key, mode, onPhase){
+  if (mode !== "cors"){
+    try {
+      onPhase("direct");
+      return await doFetch(directUrl, payload, key);
+    } catch (e){
+      const cors = isCorsErr(e);
+      const corsNote = "浏览器跨域拦截（服务器未响应 CORS）";
+      if (mode === "direct"){
+        e.message = e.message + (cors ? " — " + corsNote : "");
+        throw e;
+      }
+      if (!cors) throw e;
+      onPhase("fallback");
+    }
+  }
+  let lastErr;
+  for (const mk of CORS_PROXIES){
+    try {
+      return await doFetch(mk(directUrl), payload, key);
+    } catch (e){ lastErr = e; }
+  }
+  throw new Error("直连/代理均不可用：" + (lastErr ? String(lastErr).slice(0,150) : "unknown"));
+}
+
 $("apiGenBtn").onclick = async () => {
   const st = $("apiStatus");
   if (!S.rawText){ st.className="status err"; st.textContent="先导入转录稿"; return; }
@@ -727,23 +834,24 @@ $("apiGenBtn").onclick = async () => {
   const url = resolveApiUrl(base);
   st.className="status ok"; st.innerHTML='<span class="spin"></span> 调用中…';
   $("apiGenBtn").disabled = true;
-  console.log("[api] POST", url, "model:", model);
+  console.log("[api] POST", url, "model:", model, "proxy:", proxyMode);
   try {
-    const resp = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type":"application/json", "Authorization":"Bearer " + key },
-      body: JSON.stringify({
-        model, temperature: 0.2,
-        messages: [
-          { role:"system", content:"你是会议纪要专业撰写助手，只输出严格 JSON，不要任何其他文字。" },
-          { role:"user", content: buildPrompt() }
-        ]
-      })
-    });
-    const text = await resp.text();
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${text.slice(0,200)}`);
-    let j;
-    try { j = JSON.parse(text); } catch { throw new Error("响应不是 JSON: " + text.slice(0,200)); }
+    const payload = {
+      model, temperature: 0.2,
+      messages: [
+        { role:"system", content:"你是会议纪要专业撰写助手，只输出严格 JSON，不要任何其他文字。" },
+        { role:"user", content: buildPrompt() }
+      ]
+    };
+    const j = await apiCallWithProxy(
+      url, payload, key, proxyMode,
+      (phase) => {
+        if (phase === "fallback"){
+          st.className = "status warn";
+          st.innerHTML = '<span class="spin"></span> 直连被拦截，切换代理中转…';
+        }
+      }
+    );
     const content = j.choices?.[0]?.message?.content || "";
     const m = content.match(/\{[\s\S]*\}/);
     if (!m) throw new Error("返回中未找到 JSON 对象: " + content.slice(0,200));
@@ -823,7 +931,7 @@ $("exportExcelBtn").onclick = async () => {
     todos.forEach((t,i)=>{
       const row = 8 + i;
       const aCell = ws.getCell(`A${row}`);
-      aCell.value = null;           // 清空类型：模板继承的 datetime 不能直接覆盖
+      aCell.value = null;
       aCell.numFmt = "0";
       aCell.value = i+1;
       aCell.font = { name:'微软雅黑', size:10 };
@@ -850,7 +958,6 @@ $("exportExcelBtn").onclick = async () => {
       aCell.value = i+1;
       ws.getRow(8+i).height = 18;
     }
-    // 超过 4 行补格式
     if (todos.length > 4){
       const thin = {style:'thin'};
       for (let i=4; i<todos.length; i++){
