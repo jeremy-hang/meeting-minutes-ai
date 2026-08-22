@@ -192,11 +192,29 @@ input::placeholder,textarea::placeholder{color:var(--text-mute)}
 .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:13px}
 .meta-grid .k{color:var(--text-3);font-size:11px;letter-spacing:.01em;margin-bottom:3px}
 .meta-grid .v{font-weight:600;color:var(--text)}
-.chiprow{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chiprow{
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;
+  max-height:104px;overflow:hidden;position:relative;
+  transition:max-height .3s ease;
+}
+.chiprow.expanded{max-height:600px}
+.chiprow:not(.expanded)::after{
+  content:"";position:absolute;bottom:0;left:0;right:0;height:36px;
+  background:linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events:none;
+}
 .chip{
   background:var(--bg-elev);border:1px solid var(--border);
   border-radius:99px;padding:3px 12px;font-size:12px;color:var(--text-2);
 }
+.chip-toggle{
+  font-size:12px;color:var(--brand);cursor:pointer;background:none;border:none;
+  padding:6px 0 0;font-family:inherit;font-weight:500;
+  display:flex;align-items:center;gap:4px;
+}
+.chip-toggle:hover{text-decoration:underline}
+.chip-toggle svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;transition:transform .2s}
+.chip-toggle.open svg{transform:rotate(180deg)}
 
 /* ============ Tabs ============ */
 .tabs{
@@ -373,6 +391,12 @@ footer .sig{
       </div>
       <input type="file" id="fileInput" accept=".txt" style="display:none">
       <div id="fileMeta"></div>
+      <div id="gotoGen" style="display:none;margin-top:12px">
+        <button class="btn btn-primary" id="gotoGenBtn" style="width:100%">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+          下一步：去生成纪要
+        </button>
+      </div>
       <label>或粘贴转录文本</label>
       <textarea id="pasteArea" placeholder="直接粘贴转录文字…"></textarea>
       <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px">
@@ -412,9 +436,9 @@ footer .sig{
           <div id="proxyCors">代理中转</div>
         </div>
         <div class="proxy-note">
-          <strong>自动回退</strong>：先直连，被浏览器拦截后走公共 CORS 代理（Key 会经第三方）。<br>
-          <strong>直连</strong>：最快，但部分 API 服务器不支持浏览器调用<br>
-          <strong>代理中转</strong>：绕过浏览器限制，公共代理可绕过跨域
+          <strong>自动回退</strong>：先直连，被浏览器拦截后依次尝试 5 个公共 CORS 代理。<br>
+          <strong>直连</strong>：最快，需 API 服务器允许网页调用<br>
+          <strong>代理中转</strong>：直接用公共代理。<b>免费代理不稳定，全挂时会自动切「手动粘贴」兜底</b>
         </div>
 
         <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:20px">
@@ -543,6 +567,7 @@ function ingest(raw, filename){
   S.meta.recorder = "识野AI纪要";
   S.meta.reporter = "";
 
+  const many = p.attendees.length > 6;
   $("fileMeta").innerHTML = `
     <div class="meta-card">
       <div class="meta-grid">
@@ -551,11 +576,28 @@ function ingest(raw, filename){
         <div><div class="k">会议日期</div><div class="v">${escapeHtml(S.meta.time)}</div></div>
         <div><div class="k">清洗字数</div><div class="v">${S.rawText.length}</div></div>
       </div>
-      <div class="chiprow">${p.attendees.map(a=>`<span class="chip">${escapeHtml(a)}</span>`).join("")}</div>
+      <div class="chiprow" id="chiprow">${p.attendees.map(a=>`<span class="chip">${escapeHtml(a)}</span>`).join("")}</div>
+      ${many ? `<button class="chip-toggle" id="chipToggle">展开全部 ${p.attendees.length} 人 <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>` : ""}
     </div>`;
+  const toggle = $("chipToggle");
+  if (toggle){
+    toggle.onclick = () => {
+      const row = $("chiprow");
+      const open = row.classList.toggle("expanded");
+      toggle.classList.toggle("open", open);
+      toggle.innerHTML = open
+        ? `收起 <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`
+        : `展开全部 ${p.attendees.length} 人 <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>`;
+    };
+  }
+  $("gotoGen").style.display = "block";
   $("parseStatus").className = "status ok";
   $("parseStatus").textContent = "✓ 转录已解析";
 }
+
+$("gotoGenBtn").onclick = () => {
+  document.querySelector(".panel:nth-child(2)").scrollIntoView({behavior:"smooth", block:"start"});
+};
 
 /* ==================== 文件读取 ==================== */
 $("dropzone").onclick = () => $("fileInput").click();
@@ -778,20 +820,28 @@ const CORS_PROXIES = [
   (u) => "https://corsproxy.io/?url=" + encodeURIComponent(u),
   (u) => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u),
   (u) => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u),
+  (u) => "https://api.cors.lol/?url=" + encodeURIComponent(u),
+  (u) => "https://proxy.cors.sh/" + u,
 ];
 
 function isCorsErr(e){
   const s = String(e).toLowerCase();
-  return !s.includes("http ") &&
+  return !s.includes("http ") && !s.includes("aborted") &&
     (s.includes("failed to fetch") || s.includes("networkerror") || s.includes("load failed"));
 }
 
-async function doFetch(url, payload, key){
-  const resp = await fetch(url, {
+function fetchWithTimeout(url, opts, ms){
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(timer));
+}
+
+async function doFetch(url, payload, key, timeoutMs = 120000){
+  const resp = await fetchWithTimeout(url, {
     method: "POST",
     headers: { "Content-Type":"application/json", "Authorization":"Bearer " + key },
     body: JSON.stringify(payload)
-  });
+  }, timeoutMs);
   const text = await resp.text();
   if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${text.slice(0,200)}`);
   let j;
@@ -806,9 +856,8 @@ async function apiCallWithProxy(directUrl, payload, key, mode, onPhase){
       return await doFetch(directUrl, payload, key);
     } catch (e){
       const cors = isCorsErr(e);
-      const corsNote = "浏览器跨域拦截（服务器未响应 CORS）";
       if (mode === "direct"){
-        e.message = e.message + (cors ? " — " + corsNote : "");
+        e.message = e.message + (cors ? " — 浏览器跨域拦截（服务器不支持网页调用），请切「自动回退」或「代理中转」" : "");
         throw e;
       }
       if (!cors) throw e;
@@ -816,12 +865,16 @@ async function apiCallWithProxy(directUrl, payload, key, mode, onPhase){
     }
   }
   let lastErr;
-  for (const mk of CORS_PROXIES){
+  for (let i = 0; i < CORS_PROXIES.length; i++){
     try {
-      return await doFetch(mk(directUrl), payload, key);
+      onPhase("proxy", i);
+      return await doFetch(CORS_PROXIES[i](directUrl), payload, key, 150000);
     } catch (e){ lastErr = e; }
   }
-  throw new Error("直连/代理均不可用：" + (lastErr ? String(lastErr).slice(0,150) : "unknown"));
+  const err = new Error("直连被跨域拦截，5 个公共代理也全部失效（免费代理不稳定）。建议切「手动粘贴」生成方式——已自动帮你切过去并生成好指令");
+  err.suggestPaste = true;
+  err.lastErr = lastErr;
+  throw err;
 }
 
 $("apiGenBtn").onclick = async () => {
@@ -845,10 +898,13 @@ $("apiGenBtn").onclick = async () => {
     };
     const j = await apiCallWithProxy(
       url, payload, key, proxyMode,
-      (phase) => {
+      (phase, idx) => {
         if (phase === "fallback"){
           st.className = "status warn";
           st.innerHTML = '<span class="spin"></span> 直连被拦截，切换代理中转…';
+        } else if (phase === "proxy"){
+          st.className = "status warn";
+          st.innerHTML = `<span class="spin"></span> 代理 ${idx+1}/5 尝试中…`;
         }
       }
     );
@@ -858,9 +914,21 @@ $("apiGenBtn").onclick = async () => {
     applyResult(JSON.parse(m[0]));
     st.className="status ok"; st.textContent="✓ 已生成";
   } catch(e){
-    st.className="status err";
-    st.textContent="✗ " + (e.message || String(e)).slice(0,150);
-    console.error(e);
+    if (e.suggestPaste){
+      // 自动兜底：切到手动粘贴 tab，生成好指令并弹窗
+      switchTab("paste");
+      const p = buildPrompt();
+      $("promptText").textContent = p;
+      navigator.clipboard.writeText(p).catch(()=>{});
+      $("promptModal").style.display = "flex";
+      st.className = "status err";
+      st.textContent = "✗ " + e.message.slice(0,150);
+      console.error(e);
+    } else {
+      st.className="status err";
+      st.textContent="✗ " + (e.message || String(e)).slice(0,150);
+      console.error(e);
+    }
   } finally {
     $("apiGenBtn").disabled = false;
   }
