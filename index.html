@@ -411,13 +411,13 @@ footer .sig{
           <button class="preset-btn" data-preset='{"base":"https://dashscope.aliyuncs.com/compatible-mode/v1","model":"qwen-plus"}'>通义千问</button>
           <button class="preset-btn" data-preset='{"base":"https://api.moonshot.cn/v1","model":"kimi-k2-0711-preview"}'>Kimi</button>
           <button class="preset-btn" data-preset='{"base":"https://open.bigmodel.cn/api/paas/v4","model":"glm-4-flash"}'>智谱</button>
-          <button class="preset-btn" data-preset='{"base":"https://api.openai.com/v1","model":"gpt-4o-mini","needsProxy":true}'>OpenAI</button>
+          <button class="preset-btn icompify" data-preset='{"base":"https://api.icompify.com/v1","model":"deepseek-v4-flash"}'>积算平台 ⚠️</button>
         </div>
         <div id="icompifyNote" style="display:none;background:#fff8e6;border:1px solid #f0c36d;border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:#8a6d3b;margin-top:10px;line-height:1.7">
           <b>积算平台不能用于 API 直连</b><br>
-          api.icompify.com 服务器不支持浏览器调用（2026/8/23 实测确认），也不能走公共代理中转（Key 会暴露给第三方）。请切换以下任一：<br>
-          <b>· DeepSeek / 通义千问 / Kimi / 智谱</b> — 支持浏览器直连，安全且免费代理兜底可用<br>
-          <b>· 右侧「手动粘贴」tab</b> — 把 prompt 复制给任意 AI，粘回 JSON 即可
+          api.icompify.com 服务器不支持浏览器调用（2026/8/23 实测确认），也不能走公共代理中转（Key 会暴露给第三方）。<br>
+          <b>推荐改填</b>：DeepSeek / 通义千问 / Kimi / 智谱 支持浏览器直连，安全且公共代理兜底可用。<br>
+          <b>或切右侧「手动粘贴」tab</b> — 把 prompt 复制给任意 AI，粘回 JSON 即可。
         </div>
         <label>API 地址<span style="text-transform:none;color:var(--text-mute);font-weight:400">（支持 base 或完整 /chat/completions 均可）</span></label>
         <input type="text" id="apiBase" placeholder="https://api.deepseek.com/v1">
@@ -985,6 +985,8 @@ $("exportExcelBtn").onclick = async () => {
     ws.getRow(1).height = 24;
 
     ws.getCell("B2").value = S.meta.time;
+    // R2 汇报人占 D2 一格 header + E2 一格值；为和 R4 右边 3 格区间对齐，D2:E2 合并给值横向空间
+    ws.mergeCells("D2:E2");
     ws.getCell("E2").value = S.meta.reporter || "";
     ws.getRow(2).height = 18;
 
