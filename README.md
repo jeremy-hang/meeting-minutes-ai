@@ -27,14 +27,16 @@
 
 支持任意 OpenAI 兼容接口，点预设一键填充：
 
-| 提供商 | API 地址 | 默认模型 |
-|---|---|---|
-| 积算平台 | `https://api.icompify.com/v1` | `deepseek-v4-flash` |
-| DeepSeek | `https://api.deepseek.com/v1` | `deepseek-chat` |
-| 通义千问 | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `qwen-plus` |
-| Kimi | `https://api.moonshot.cn/v1` | `kimi-k2-0711-preview` |
-| OpenAI | `https://api.openai.com/v1` | `gpt-4o-mini` |
-| 智谱 GLM | `https://open.bigmodel.cn/api/paas/v4` | `glm-4-flash` |
+| 提供商 | API 地址 | 默认模型 | 浏览器直连 |
+|---|---|---|---|
+| **DeepSeek（推荐默认）** | `https://api.deepseek.com/v1` | `deepseek-chat` | ✅ |
+| 通义千问 | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `qwen-plus` | ✅ |
+| Kimi | `https://api.moonshot.cn/v1` | `kimi-k2-0711-preview` | ✅ |
+| 智谱 GLM | `https://open.bigmodel.cn/api/paas/v4` | `glm-4-flash` | ✅ |
+| OpenAI | `https://api.openai.com/v1` | `gpt-4o-mini` | ❌ 需走代理 |
+| 积算平台 | `https://api.icompify.com/v1` | `deepseek-v4-flash` | ❌ 不支持浏览器调用 |
+
+> **积算平台（2026-08-23 实测确认）**：api.icompify.com 服务器不响应浏览器 CORS 预检，不能用于 API 直连，公共代理中转也不放行 Key（会暴露给第三方）。请改用 DeepSeek / 千问 / Kimi / 智谱，或切「手动粘贴」模式。
 
 API Key 仅存储在浏览器 `localStorage`，不会发送到任何服务器。
 
@@ -44,11 +46,11 @@ API Key 仅存储在浏览器 `localStorage`，不会发送到任何服务器。
 
 | 模式 | 适用场景 | 说明 |
 |---|---|---|
-| **自动回退**（推荐） | 大多数场景 | 先直连，被拦截自动切换公共 CORS 代理，体验最顺畅 |
-| **直连** | API 服务器已配置 CORS | 最快，不经任何中转，部分服务器不支持 |
-| **代理中转** | 直连确认不可用 | 公共代理（corsproxy.io / allorigins.win）绕过浏览器限制，Key 会经第三方 |
+| **自动回退**（默认推荐） | 大多数场景 | 先直连，被拦截自动切换公共 CORS 代理。DeepSeek / 千问 / Kimi / 智谱都能直连成功，几乎不会走到代理路径 |
+| **直连** | API 服务器已配置 CORS | 最快，不经任何中转 |
+| **代理中转** | 直连确认不可用 | Key 会经第三方公共服务（corsproxy.io 等），仅作兜底。**积算平台不要用此模式**，Key 会暴露给第三方 |
 
-若"自动回退"和"代理中转"都失败，说明公共代理不稳定，请切换"手动粘贴"模式。
+若"自动回退"和"代理中转"都失败（公共代理不稳定），系统自动切换「手动粘贴」并复制好 prompt——发给任意 AI 粘回 JSON 即可，永远不会卡死。
 
 ## 📐 会议纪要规范
 
