@@ -80,21 +80,21 @@ body{
 
 /* ============ Layout ============ */
 .layout{
-  display:grid;grid-template-columns:400px 1fr;gap:24px;
-  padding:32px 40px 56px;
+  display:grid;grid-template-columns:380px 1fr;gap:18px;
+  padding:22px 32px 44px;
   max-width:1480px;margin:0 auto;
 }
-@media (max-width:1100px){ .layout{grid-template-columns:1fr;padding:20px} }
+@media (max-width:1100px){ .layout{grid-template-columns:1fr;padding:16px} }
 
 /* ============ Panel ============ */
 .panel{
   background:var(--bg-card);
   border:1px solid var(--border);
   border-radius:var(--radius-lg);
-  padding:24px;
+  padding:18px;
   box-shadow:var(--shadow);
 }
-.panel + .panel{margin-top:20px}
+.panel + .panel{margin-top:14px}
 .panel h2{
   font-size:13px;font-weight:600;letter-spacing:-.01em;
   color:var(--text);
@@ -114,12 +114,12 @@ body{
 
 /* ============ Form ============ */
 label{
-  display:block;font-size:12px;font-weight:500;color:var(--text-2);
-  margin:16px 0 6px;letter-spacing:-.01em;
+  display:block;font-size:11px;font-weight:500;color:var(--text-2);
+  margin:12px 0 4px;letter-spacing:-.01em;
 }
 input[type=text],input[type=password],select,textarea{
-  width:100%;padding:10px 12px;border:1px solid var(--border);
-  border-radius:var(--radius-sm);font-size:14px;font-family:inherit;
+  width:100%;padding:8px 11px;border:1px solid var(--border);
+  border-radius:var(--radius-sm);font-size:13px;font-family:inherit;
   background:var(--bg-elev);color:var(--text);
   transition:border-color .15s, box-shadow .15s;
 }
@@ -128,7 +128,7 @@ input:focus,textarea:focus,select:focus{
   outline:none;border-color:var(--brand);
   box-shadow:0 0 0 4px var(--brand-soft);
 }
-textarea{resize:vertical;min-height:80px}
+textarea{resize:vertical;min-height:60px}
 input::placeholder,textarea::placeholder{color:var(--text-mute)}
 
 /* ============ Buttons ============ */
@@ -170,8 +170,8 @@ input::placeholder,textarea::placeholder{color:var(--text-mute)}
 /* ============ Dropzone ============ */
 .dropzone{
   border:1.5px dashed var(--border);border-radius:var(--radius);
-  padding:36px 16px;text-align:center;color:var(--text-3);
-  font-size:14px;cursor:pointer;transition:all .2s;
+  padding:20px 16px;text-align:center;color:var(--text-3);
+  font-size:13px;cursor:pointer;transition:all .2s;
   background:var(--bg);
 }
 .dropzone:hover,.dropzone.over{
@@ -179,7 +179,7 @@ input::placeholder,textarea::placeholder{color:var(--text-mute)}
   background:var(--brand-soft);
 }
 .dropzone .dz-icon{
-  width:40px;height:40px;margin:0 auto 10px;opacity:.5;
+  width:28px;height:28px;margin:0 auto 6px;opacity:.5;
 }
 .dropzone .dz-icon svg{width:100%;height:100%;stroke:currentColor;stroke-width:1.5;fill:none}
 
@@ -187,30 +187,22 @@ input::placeholder,textarea::placeholder{color:var(--text-mute)}
 .meta-card{
   background:var(--bg);
   border:1px solid var(--border);
-  border-radius:var(--radius);padding:16px;margin-top:16px;
+  border-radius:var(--radius);padding:12px 14px;margin-top:12px;
 }
-.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:13px}
-.meta-grid .k{color:var(--text-3);font-size:11px;letter-spacing:.01em;margin-bottom:3px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;font-size:12px}
+.meta-grid .k{color:var(--text-3);font-size:11px;letter-spacing:.01em;margin-bottom:2px}
 .meta-grid .v{font-weight:600;color:var(--text)}
 .chiprow{
-  display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;
-  max-height:104px;overflow:hidden;position:relative;
-  transition:max-height .3s ease;
-}
-.chiprow.expanded{max-height:600px}
-.chiprow:not(.expanded)::after{
-  content:"";position:absolute;bottom:0;left:0;right:0;height:36px;
-  background:linear-gradient(to bottom, transparent, var(--bg));
-  pointer-events:none;
+  display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;
 }
 .chip{
   background:var(--bg-elev);border:1px solid var(--border);
-  border-radius:99px;padding:3px 12px;font-size:12px;color:var(--text-2);
+  border-radius:99px;padding:2px 10px;font-size:11px;color:var(--text-2);
 }
 .chip-toggle{
   font-size:12px;color:var(--brand);cursor:pointer;background:none;border:none;
-  padding:6px 0 0;font-family:inherit;font-weight:500;
-  display:flex;align-items:center;gap:4px;
+  padding:5px 0 0;font-family:inherit;font-weight:500;
+  display:inline-flex;align-items:center;gap:4px;
 }
 .chip-toggle:hover{text-decoration:underline}
 .chip-toggle svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;transition:transform .2s}
@@ -391,13 +383,13 @@ footer .sig{
       </div>
       <input type="file" id="fileInput" accept=".txt" style="display:none">
       <div id="fileMeta"></div>
-      <div id="gotoGen" style="display:none;margin-top:12px">
+      <div id="gotoGen" style="display:none;margin-top:10px">
         <button class="btn btn-primary" id="gotoGenBtn" style="width:100%">
           <svg viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
           下一步：去生成纪要
         </button>
       </div>
-      <label>或粘贴转录文本</label>
+      <label style="margin-top:12px">或粘贴转录文本</label>
       <textarea id="pasteArea" placeholder="直接粘贴转录文字…"></textarea>
       <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px">
         <span class="status" id="parseStatus"></span>
@@ -415,19 +407,24 @@ footer .sig{
       <div id="paneApi">
         <label>API 提供商</label>
         <div class="api-preset">
-          <button class="preset-btn" data-preset='{"base":"https://api.icompify.com/v1","model":"deepseek-v4-flash"}'>积算平台</button>
           <button class="preset-btn" data-preset='{"base":"https://api.deepseek.com/v1","model":"deepseek-chat"}'>DeepSeek</button>
           <button class="preset-btn" data-preset='{"base":"https://dashscope.aliyuncs.com/compatible-mode/v1","model":"qwen-plus"}'>通义千问</button>
           <button class="preset-btn" data-preset='{"base":"https://api.moonshot.cn/v1","model":"kimi-k2-0711-preview"}'>Kimi</button>
-          <button class="preset-btn" data-preset='{"base":"https://api.openai.com/v1","model":"gpt-4o-mini"}'>OpenAI</button>
           <button class="preset-btn" data-preset='{"base":"https://open.bigmodel.cn/api/paas/v4","model":"glm-4-flash"}'>智谱</button>
+          <button class="preset-btn" data-preset='{"base":"https://api.openai.com/v1","model":"gpt-4o-mini","needsProxy":true}'>OpenAI</button>
+        </div>
+        <div id="icompifyNote" style="display:none;background:#fff8e6;border:1px solid #f0c36d;border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:#8a6d3b;margin-top:10px;line-height:1.7">
+          <b>积算平台不能用于 API 直连</b><br>
+          api.icompify.com 服务器不支持浏览器调用（2026/8/23 实测确认），也不能走公共代理中转（Key 会暴露给第三方）。请切换以下任一：<br>
+          <b>· DeepSeek / 通义千问 / Kimi / 智谱</b> — 支持浏览器直连，安全且免费代理兜底可用<br>
+          <b>· 右侧「手动粘贴」tab</b> — 把 prompt 复制给任意 AI，粘回 JSON 即可
         </div>
         <label>API 地址<span style="text-transform:none;color:var(--text-mute);font-weight:400">（支持 base 或完整 /chat/completions 均可）</span></label>
-        <input type="text" id="apiBase" placeholder="https://api.icompify.com/v1">
+        <input type="text" id="apiBase" placeholder="https://api.deepseek.com/v1">
         <label>API Key</label>
         <input type="password" id="apiKey" placeholder="sk-…">
         <label>模型名</label>
-        <input type="text" id="apiModel" placeholder="deepseek-v4-flash">
+        <input type="text" id="apiModel" placeholder="deepseek-chat">
 
         <label>连接方式</label>
         <div class="proxy-tabs">
@@ -436,21 +433,21 @@ footer .sig{
           <div id="proxyCors">代理中转</div>
         </div>
         <div class="proxy-note">
-          <strong>自动回退</strong>：先直连，被浏览器拦截后依次尝试 5 个公共 CORS 代理。<br>
-          <strong>直连</strong>：最快，需 API 服务器允许网页调用<br>
-          <strong>代理中转</strong>：直接用公共代理。<b>免费代理不稳定，全挂时会自动切「手动粘贴」兜底</b>
+          <b>自动回退</b>：先直连，被浏览器拦截后依次尝试 5 个公共代理。<br>
+          <b>直连 / 自动回退</b>：大部分服务器（DeepSeek · 千问 · Kimi · 智谱）支持浏览器调用，推荐<br>
+          <b>代理中转</b>：Key 会经第三方公共服务（corsproxy.io 等），仅作备选。<b>积算平台勿用</b>
         </div>
 
-        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:20px">
+        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px">
           <span class="status" id="apiStatus"></span>
           <button class="btn btn-primary" id="apiGenBtn">
             <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
             生成纪要
           </button>
         </div>
-        <div style="margin-top:12px;font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:6px">
+        <div style="margin-top:10px;font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:6px">
           <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;flex:none"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          Key 仅存浏览器本地，不会外发（自动回退模式下会经公共代理）
+          Key 仅存浏览器本地，不会外发（自动回退模式下若直连失败会经公共代理）
         </div>
       </div>
 
@@ -653,14 +650,20 @@ document.querySelectorAll(".preset-btn").forEach(btn=>{
     $("apiBase").value = p.base;
     $("apiModel").value = p.model;
     setLS("apiBase", p.base); setLS("apiModel", p.model);
+    updateIcompifyNote(p.base);
   };
 });
 
+function updateIcompifyNote(base){
+  $("icompifyNote").style.display = (base||"").includes("icompify.com") ? "block" : "none";
+}
+
 /* 恢复 API 配置 + 默认 */
 if (!LS("apiBase")){
-  setLS("apiBase", "https://api.icompify.com/v1");
-  setLS("apiModel", "deepseek-v4-flash");
+  setLS("apiBase", "https://api.deepseek.com/v1");
+  setLS("apiModel", "deepseek-chat");
 }
+updateIcompifyNote(LS("apiBase"));
 ["apiBase","apiKey","apiModel"].forEach(id => {
   $(id).value = LS(id);
   $(id).oninput = () => setLS(id, $(id).value);
@@ -885,6 +888,11 @@ $("apiGenBtn").onclick = async () => {
   const key = $("apiKey").value.trim();
   const model = $("apiModel").value.trim();
   if (!base || !key || !model){ st.className="status err"; st.textContent="请填全 API 配置"; return; }
+  if (base.includes("icompify.com")){
+    st.className = "status err";
+    st.textContent = "✗ 积算平台不能用于 API 直连（见上方说明），请切换其他提供商或用「手动粘贴」";
+    return;
+  }
   const url = resolveApiUrl(base);
   st.className="status ok"; st.innerHTML='<span class="spin"></span> 调用中…';
   $("apiGenBtn").disabled = true;
