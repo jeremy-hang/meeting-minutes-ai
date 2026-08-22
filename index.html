@@ -3,119 +3,239 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>识野 AI 会议纪要 · 腾讯会议转录秒变标准纪要</title>
-<meta name="description" content="上传腾讯会议转录 txt，AI 一键生成符合贵司标准格式的会议纪要 Excel。支持手动粘贴与 API 直连两种模式。">
+<title>识野 AI 会议纪要</title>
+<meta name="description" content="上传会议转录 · AI 一键生成 · 直接导出标准会议纪要">
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 <style>
 :root{
-  --bg:#fafbfc; --card:#fff; --border:#e5e7eb; --line:#eef0f3;
-  --text:#111827; --sub:#6b7280; --muted:#9ca3af;
-  --brand:#c8102e; --brand-2:#8b0a20; --brand-soft:#fdf2f4;
-  --ok:#0e9f6e; --warn:#b45309; --err:#c8102e;
-  --radius:14px; --radius-sm:8px;
-  --shadow:0 1px 3px rgba(0,0,0,.04), 0 8px 24px rgba(17,24,39,.04);
-  --shadow-md:0 4px 8px rgba(0,0,0,.06), 0 16px 40px rgba(17,24,39,.08);
+  --bg:#0f131a;
+  --bg-elev:#161c26;
+  --bg-card:#1a212e;
+  --bg-hover:#222b3a;
+  --border:#2a3444;
+  --border-strong:#3a4556;
+  --text:#e6eaf2;
+  --text-2:#b8c0d0;
+  --text-3:#7a8499;
+  --text-mute:#566074;
+  --brand:#14b8a6;
+  --brand-strong:#0d9488;
+  --brand-soft:rgba(20,184,166,.12);
+  --brand-glow:rgba(20,184,166,.25);
+  --ok:#10b981;
+  --warn:#f59e0b;
+  --err:#ef4444;
+  --radius:10px;
+  --radius-sm:6px;
+  --radius-lg:14px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+  --shadow:0 4px 12px rgba(0,0,0,.35);
+  --shadow-lg:0 12px 32px rgba(0,0,0,.45);
 }
 *{box-sizing:border-box;margin:0;padding:0}
+html{color-scheme:dark}
 body{
-  font-family:'Microsoft YaHei','PingFang SC','Helvetica Neue',sans-serif;
+  font-family:'Inter','PingFang SC','Microsoft YaHei',-apple-system,sans-serif;
   background:var(--bg); color:var(--text); line-height:1.6;
   -webkit-font-smoothing:antialiased;
+  min-height:100vh;
 }
+::selection{background:var(--brand);color:#04251f}
+
+/* ============ Top Nav ============ */
 .topbar{
-  background:linear-gradient(135deg,#c8102e 0%,#8b0a20 100%);
-  color:#fff; padding:22px 32px;
-  box-shadow:0 2px 12px rgba(200,16,46,.18);
-  position:relative; overflow:hidden;
+  background:linear-gradient(180deg, rgba(20,184,166,.06), transparent);
+  border-bottom:1px solid var(--border);
+  padding:0 32px;
+  position:sticky;top:0;z-index:10;
+  backdrop-filter:blur(12px);
+  background-color:rgba(15,19,26,.85);
 }
-.topbar::before{
-  content:''; position:absolute; right:-80px; top:-80px; width:280px;height:280px;
-  background:radial-gradient(circle, rgba(255,255,255,.08), transparent 70%);
+.topbar-inner{
+  max-width:1480px;margin:0 auto;
+  display:flex;align-items:center;gap:24px;
+  height:60px;
 }
-.topbar-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.topbar h1{font-size:20px;font-weight:700;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
-.topbar h1 .logo{
-  width:32px;height:32px;background:rgba(255,255,255,.15);border-radius:8px;
-  display:flex;align-items:center;justify-content:center;font-size:16px;backdrop-filter:blur(4px);
+.logo-mark{
+  width:28px;height:28px;flex:none;
+  background:linear-gradient(135deg,var(--brand),var(--brand-strong));
+  border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 20px var(--brand-glow);
 }
-.topbar .tag{font-size:13px;opacity:.92;margin-top:4px;font-weight:400}
-.credit{
-  font-size:12px;opacity:.85;background:rgba(255,255,255,.12);padding:4px 12px;border-radius:20px;
-  border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(4px);white-space:nowrap;
-}
-.layout{display:grid;grid-template-columns:400px 1fr;gap:20px;padding:20px 32px 32px;max-width:1400px;margin:0 auto}
-.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
-.panel + .panel{margin-top:16px}
-.panel h2{
-  font-size:14px;font-weight:700;margin-bottom:16px;color:var(--text);
+.logo-mark svg{width:16px;height:16px;stroke:#04251f;stroke-width:2.5;fill:none}
+.topbar .brand-name{
+  font-size:15px;font-weight:600;letter-spacing:.2px;
   display:flex;align-items:center;gap:8px;
 }
-.panel h2 .step-no{
-  width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;
-  font-size:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;
+.topbar .brand-tag{
+  font-size:12px;color:var(--text-3);font-weight:400;
+  border-left:1px solid var(--border);padding-left:12px;margin-left:4px;
 }
-.panel h2 .hint{font-size:12px;color:var(--sub);font-weight:400;margin-left:auto}
-label{display:block;font-size:12px;color:var(--sub);margin:14px 0 6px;font-weight:500}
+.topbar .spacer{flex:1}
+.by-credit{
+  font-size:11px;color:var(--text-mute);letter-spacing:.5px;font-weight:500;
+  padding:3px 10px;border:1px solid var(--border);border-radius:99px;
+  background:rgba(255,255,255,.02);
+}
+
+/* ============ Layout ============ */
+.layout{
+  display:grid;grid-template-columns:420px 1fr;gap:20px;
+  padding:20px 32px 40px;
+  max-width:1480px;margin:0 auto;
+}
+@media (max-width:1100px){ .layout{grid-template-columns:1fr;padding:16px} }
+
+/* ============ Panel ============ */
+.panel{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:20px;
+}
+.panel + .panel{margin-top:16px}
+.panel h2{
+  font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-3);
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:16px;
+}
+.panel h2 .step{
+  width:20px;height:20px;border-radius:5px;
+  background:var(--brand-soft);color:var(--brand);
+  font-size:11px;font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.panel h2 .hint{
+  margin-left:auto;font-size:11px;font-weight:400;letter-spacing:0;
+  text-transform:none;color:var(--text-mute);
+}
+
+/* ============ Form ============ */
+label{
+  display:block;font-size:11px;font-weight:500;color:var(--text-3);
+  margin:14px 0 6px;letter-spacing:.3px;text-transform:uppercase;
+}
 input[type=text],input[type=password],select,textarea{
-  width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);
-  font-size:13px;font-family:inherit;background:#fff;color:var(--text);
+  width:100%;padding:9px 12px;border:1px solid var(--border);
+  border-radius:var(--radius-sm);font-size:13px;font-family:inherit;
+  background:var(--bg-elev);color:var(--text);
   transition:border-color .15s, box-shadow .15s;
 }
+input:hover,textarea:hover{border-color:var(--border-strong)}
 input:focus,textarea:focus,select:focus{
-  outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft);
+  outline:none;border-color:var(--brand);
+  box-shadow:0 0 0 3px var(--brand-soft);
 }
 textarea{resize:vertical;min-height:80px}
+input::placeholder,textarea::placeholder{color:var(--text-mute)}
+
+/* ============ Buttons ============ */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:9px 18px;border:none;border-radius:var(--radius-sm);font-size:13px;
-  cursor:pointer;font-family:inherit;font-weight:500;transition:all .15s;
+  padding:8px 16px;border:none;border-radius:var(--radius-sm);font-size:13px;
+  cursor:pointer;font-family:inherit;font-weight:500;
+  transition:all .15s;
+  border:1px solid transparent;
 }
-.btn-primary{background:var(--brand);color:#fff;box-shadow:0 1px 2px rgba(200,16,46,.25)}
-.btn-primary:hover:not(:disabled){background:var(--brand-2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(200,16,46,.3)}
-.btn-primary:disabled{background:#e5c1c6;cursor:not-allowed;box-shadow:none}
-.btn-ghost{background:#fff;border:1px solid var(--border);color:var(--text)}
-.btn-ghost:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
-.btn-ok{background:var(--ok);color:#fff;box-shadow:0 1px 2px rgba(14,159,110,.25)}
-.btn-ok:hover:not(:disabled){background:#0b8a5e;transform:translateY(-1px)}
+.btn-primary{
+  background:var(--brand);color:#04251f;
+  font-weight:600;
+  box-shadow:0 0 12px var(--brand-glow);
+}
+.btn-primary:hover:not(:disabled){
+  background:#1dd6c1;transform:translateY(-1px);
+  box-shadow:0 0 24px var(--brand-glow);
+}
+.btn-primary:disabled{
+  background:rgba(20,184,166,.25);color:var(--text-mute);
+  cursor:not-allowed;box-shadow:none;transform:none;
+}
+.btn-ghost{
+  background:transparent;border-color:var(--border);color:var(--text-2);
+}
+.btn-ghost:hover{border-color:var(--brand);color:var(--brand)}
+.btn-ok{
+  background:var(--ok);color:#01170f;font-weight:600;
+}
+.btn-ok:hover:not(:disabled){background:#1ed19a;transform:translateY(-1px)}
+.btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;flex:none}
+
+/* ============ Dropzone ============ */
 .dropzone{
-  border:2px dashed var(--border);border-radius:var(--radius-sm);padding:28px 16px;
-  text-align:center;color:var(--sub);font-size:13px;cursor:pointer;transition:.15s;
-  background:linear-gradient(180deg,#fafbfc 0%,#fff 100%);
+  border:1.5px dashed var(--border);border-radius:var(--radius);
+  padding:32px 16px;text-align:center;color:var(--text-3);
+  font-size:13px;cursor:pointer;transition:all .2s;
+  background:var(--bg-elev);
 }
 .dropzone:hover,.dropzone.over{
-  border-color:var(--brand);background:var(--brand-soft);color:var(--brand);
+  border-color:var(--brand);color:var(--brand);
+  background:var(--brand-soft);
 }
-.dropzone .icon{font-size:24px;display:block;margin-bottom:6px}
+.dropzone .dz-icon{
+  width:36px;height:36px;margin:0 auto 8px;opacity:.6;
+}
+.dropzone .dz-icon svg{width:100%;height:100%;stroke:currentColor;stroke-width:1.5;fill:none}
+
+/* ============ Meta Card ============ */
 .meta-card{
-  background:linear-gradient(135deg,#f0f9ff 0%,#ffeef0 100%);
-  border:1px solid #e0e7ff;border-radius:var(--radius-sm);padding:14px;margin-top:14px;
+  background:var(--bg-elev);
+  border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px;margin-top:14px;
 }
-.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px}
-.meta-grid .k{color:var(--sub);font-size:11px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px}
+.meta-grid .k{color:var(--text-3);font-size:10px;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}
 .meta-grid .v{font-weight:600;color:var(--text)}
-.chiprow{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.chiprow{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
 .chip{
-  background:#fff;border:1px solid var(--border);border-radius:10px;padding:2px 8px;
-  font-size:11px;color:var(--sub);
+  background:var(--bg-hover);border:1px solid var(--border);
+  border-radius:99px;padding:2px 10px;font-size:11px;color:var(--text-2);
 }
+
+/* ============ Tabs ============ */
 .tabs{
-  display:flex;background:var(--bg);border-radius:var(--radius-sm);padding:3px;
-  font-size:12px;margin-top:4px;gap:2px;
+  display:flex;background:var(--bg-elev);border-radius:var(--radius-sm);
+  padding:3px;gap:2px;font-size:12px;
+  border:1px solid var(--border);
 }
 .tabs div{
-  flex:1;text-align:center;padding:8px 0;cursor:pointer;color:var(--sub);
-  border-radius:6px;font-weight:500;transition:.15s;
+  flex:1;text-align:center;padding:7px 0;cursor:pointer;
+  color:var(--text-3);border-radius:4px;font-weight:500;transition:.15s;
 }
-.tabs div.on{background:#fff;color:var(--brand);font-weight:600;box-shadow:var(--shadow)}
-.status{font-size:12px;min-height:18px;display:inline-flex;align-items:center;gap:4px}
+.tabs div:hover{color:var(--text)}
+.tabs div.on{background:var(--bg-hover);color:var(--brand);font-weight:600;box-shadow:var(--shadow-sm)}
+
+/* ============ Presets ============ */
+.api-preset{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.preset-btn{
+  font-size:11px;padding:5px 12px;background:var(--bg-elev);
+  color:var(--text-2);border:1px solid var(--border);
+  border-radius:99px;cursor:pointer;font-family:inherit;font-weight:500;
+  transition:all .15s;
+}
+.preset-btn:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
+.preset-btn.active{background:var(--brand);color:#04251f;border-color:var(--brand);font-weight:600}
+
+/* ============ Status ============ */
+.status{font-size:12px;min-height:18px;display:inline-flex;align-items:center;gap:6px}
 .status.ok{color:var(--ok)}
 .status.err{color:var(--err)}
 .status.warn{color:var(--warn)}
-#resultFrame{width:100%}
+.spin{
+  display:inline-block;width:12px;height:12px;
+  border:2px solid rgba(255,255,255,.15);
+  border-top-color:currentColor;border-radius:50%;
+  animation:s .7s linear infinite;vertical-align:-2px;
+}
+@keyframes s{to{transform:rotate(360deg)}}
+
+/* ============ Preview ============ */
+#resultFrame{width:100%;overflow:auto}
 table.mtable{
   border-collapse:collapse;width:100%;font-size:13px;background:#fff;
-  border:1px solid #d1d5db;
+  border:1px solid #d1d5db;color:#000;
 }
 table.mtable td,table.mtable th{
   border:1px solid #d1d5db;padding:8px 10px;vertical-align:middle;
@@ -129,14 +249,13 @@ table.mtable .tcell{
   letter-spacing:2px;background:#c0c0c0!important;color:#000;
 }
 .content-body{
-  white-space:pre-wrap;font-size:13px;line-height:1.85;
-  color:var(--text);
+  white-space:pre-wrap;font-size:13px;line-height:1.85;color:#000;
 }
 .content-body .topic{font-weight:700;display:block;margin-top:8px}
 .content-body .topic:first-child{margin-top:0}
 [contenteditable="true"]{
   outline:2px dashed var(--brand);outline-offset:1px;cursor:text;
-  background:#fffdf5;
+  background:#fffef5;
 }
 .todo-add{
   font-size:12px;margin-top:8px;cursor:pointer;color:var(--brand);
@@ -144,48 +263,56 @@ table.mtable .tcell{
   display:inline-flex;align-items:center;gap:4px;
 }
 .todo-add:hover{text-decoration:underline}
-.footer-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;align-items:center}
-.footer-actions .spacer{margin-right:auto}
-.small{font-size:12px;color:var(--sub)}
-.spin{
-  display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.35);
-  border-top-color:#fff;border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px;
+
+/* ============ Empty state ============ */
+.empty-state{
+  text-align:center;padding:80px 20px;color:var(--text-mute);
 }
-@keyframes s{to{transform:rotate(360deg)}}
+.empty-state .icon{
+  width:56px;height:56px;margin:0 auto 14px;opacity:.3;
+}
+.empty-state .icon svg{width:100%;height:100%;stroke:currentColor;stroke-width:1.5;fill:none}
+.empty-state .title{font-size:14px;color:var(--text-3);margin-bottom:4px}
+.empty-state .desc{font-size:12px}
+
+/* ============ Footer actions ============ */
+.footer-actions{
+  display:flex;gap:10px;justify-content:flex-end;
+  margin-top:18px;align-items:center;
+}
+.footer-actions .spacer{margin-right:auto}
+
+/* ============ Modal ============ */
 .modal-mask{
-  position:fixed;inset:0;background:rgba(17,24,39,.5);display:none;align-items:center;
-  justify-content:center;z-index:50;backdrop-filter:blur(4px);
+  position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;
+  align-items:center;justify-content:center;z-index:50;
+  backdrop-filter:blur(6px);
 }
 .modal{
-  background:#fff;border-radius:var(--radius);padding:24px;width:680px;max-width:92vw;
-  max-height:85vh;overflow:auto;box-shadow:var(--shadow-md);
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:24px;width:680px;max-width:92vw;
+  max-height:85vh;overflow:auto;box-shadow:var(--shadow-lg);
 }
-.modal h3{font-size:16px;margin-bottom:10px;font-weight:700}
+.modal h3{
+  font-size:15px;margin-bottom:8px;font-weight:600;color:var(--text);
+  display:flex;align-items:center;gap:8px;
+}
 .modal .close-row{display:flex;justify-content:flex-end;margin-top:16px}
 pre.hint{
-  background:#1f2937;color:#d1d5db;padding:14px;border-radius:var(--radius-sm);
-  font-size:12px;overflow:auto;white-space:pre-wrap;max-height:320px;line-height:1.6;
-  font-family:'SF Mono',Monaco,Consolas,monospace;
+  background:#0a0d12;color:#a8b3c2;padding:14px;border-radius:var(--radius-sm);
+  font-size:12px;overflow:auto;white-space:pre-wrap;max-height:340px;line-height:1.6;
+  font-family:'JetBrains Mono','SF Mono',Monaco,Consolas,monospace;
+  border:1px solid var(--border);
 }
-.api-preset{
-  display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;
-}
-.preset-btn{
-  font-size:11px;padding:4px 10px;background:var(--brand-soft);color:var(--brand);
-  border:none;border-radius:10px;cursor:pointer;font-family:inherit;
-}
-.preset-btn:hover{background:var(--brand);color:#fff}
-.empty-state{
-  text-align:center;padding:80px 20px;color:var(--muted);
-}
-.empty-state .icon{font-size:48px;margin-bottom:12px;opacity:.5}
+
+/* ============ Footer ============ */
 footer{
-  text-align:center;padding:20px;font-size:12px;color:var(--muted);
-  border-top:1px solid var(--line);background:#fff;
+  text-align:center;padding:24px;font-size:12px;color:var(--text-mute);
+  border-top:1px solid var(--border);
+  margin-top:20px;
 }
-footer a{color:var(--brand);text-decoration:none}
-@media (max-width:1100px){
-  .layout{grid-template-columns:1fr;padding:16px}
+footer .sig{
+  font-family:'JetBrains Mono',monospace;letter-spacing:1px;
 }
 </style>
 </head>
@@ -193,11 +320,12 @@ footer a{color:var(--brand);text-decoration:none}
 
 <div class="topbar">
   <div class="topbar-inner">
-    <div>
-      <h1><span class="logo">📋</span>识野 AI 会议纪要生成器</h1>
-      <div class="tag">上传腾讯会议转录 · AI 一键生成 · 直接导出公司标准 Excel</div>
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M5 4h14M5 12h14M5 20h9"/></svg>
     </div>
-    <div class="credit">by 识野Insight</div>
+    <div class="brand-name">识野 AI 会议纪要<span class="brand-tag">上传会议转录 · AI 一键生成 · 直接导出标准会议纪要</span></div>
+    <div class="spacer"></div>
+    <div class="by-credit">by 识野Insight</div>
   </div>
 </div>
 
@@ -205,16 +333,18 @@ footer a{color:var(--brand);text-decoration:none}
   <!-- 左侧：输入与配置 -->
   <div>
     <div class="panel">
-      <h2><span class="step-no">1</span>导入转录稿</h2>
+      <h2><span class="step">01</span>导入转录稿<span class="hint">.txt</span></h2>
       <div class="dropzone" id="dropzone">
-        <span class="icon">📄</span>
+        <div class="dz-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        </div>
         点击选择 或 拖入 .txt 文件<br>
-        <span class="small">支持腾讯会议 GMT 格式转录</span>
+        <span style="font-size:11px;color:var(--text-mute)">支持腾讯会议 GMT 格式转录</span>
       </div>
       <input type="file" id="fileInput" accept=".txt" style="display:none">
       <div id="fileMeta"></div>
       <label>或粘贴转录文本</label>
-      <textarea id="pasteArea" placeholder="直接粘贴转录文字，点「使用粘贴内容」"></textarea>
+      <textarea id="pasteArea" placeholder="直接粘贴转录文字…"></textarea>
       <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px">
         <span class="status" id="parseStatus"></span>
         <button class="btn btn-ghost" id="usePasteBtn">使用粘贴内容</button>
@@ -222,14 +352,14 @@ footer a{color:var(--brand);text-decoration:none}
     </div>
 
     <div class="panel">
-      <h2><span class="step-no">2</span>选择生成方式</h2>
+      <h2><span class="step">02</span>选择生成方式<span class="hint">AI 模型</span></h2>
       <div class="tabs">
         <div id="tabApi" class="on">API 直连</div>
         <div id="tabPaste">手动粘贴</div>
       </div>
 
       <div id="paneApi">
-        <label>API 提供商（点击快速填充）</label>
+        <label>API 提供商</label>
         <div class="api-preset">
           <button class="preset-btn" data-preset='{"base":"https://api.icompify.com/v1","model":"deepseek-v4-flash"}'>积算平台</button>
           <button class="preset-btn" data-preset='{"base":"https://api.deepseek.com/v1","model":"deepseek-chat"}'>DeepSeek</button>
@@ -238,31 +368,37 @@ footer a{color:var(--brand);text-decoration:none}
           <button class="preset-btn" data-preset='{"base":"https://api.openai.com/v1","model":"gpt-4o-mini"}'>OpenAI</button>
           <button class="preset-btn" data-preset='{"base":"https://open.bigmodel.cn/api/paas/v4","model":"glm-4-flash"}'>智谱</button>
         </div>
-        <label>API 地址<span class="small">（支持 base 或完整 /chat/completions 均可）</span></label>
-        <input type="text" id="apiBase" placeholder="https://api.icompify.com/v1 或 .../chat/completions">
+        <label>API 地址<span style="text-transform:none;color:var(--text-mute);font-weight:400">（支持 base 或完整 /chat/completions 均可）</span></label>
+        <input type="text" id="apiBase" placeholder="https://api.icompify.com/v1">
         <label>API Key</label>
-        <input type="password" id="apiKey" placeholder="sk-...">
+        <input type="password" id="apiKey" placeholder="sk-…">
         <label>模型名</label>
-        <input type="text" id="apiModel" placeholder="deepseek-chat">
-        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px">
+        <input type="text" id="apiModel" placeholder="deepseek-v4-flash">
+        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:16px">
           <span class="status" id="apiStatus"></span>
-          <button class="btn btn-primary" id="apiGenBtn">生成纪要</button>
+          <button class="btn btn-primary" id="apiGenBtn">
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            生成纪要
+          </button>
         </div>
-        <div class="small" style="margin-top:8px;color:var(--warn)">💡 Key 只存在你浏览器 localStorage，不会发往任何服务器</div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text-mute);display:flex;align-items:center;gap:6px">
+          <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;flex:none"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Key 仅存在浏览器 localStorage，不会外发
+        </div>
       </div>
 
       <div id="panePaste" style="display:none">
-        <div class="small" style="margin-top:10px;padding:10px;background:var(--brand-soft);border-radius:6px">
-          1️⃣ 点「生成提取指令」复制 prompt<br>
-          2️⃣ 发给任意 AI（ChatGPT/豆包/Kimi/DeepSeek...）<br>
-          3️⃣ 把返回的 JSON 粘贴回下面
+        <div style="background:var(--brand-soft);border:1px solid var(--brand);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--brand-strong);margin-top:12px;line-height:1.8">
+          1. 点「生成提取指令」复制 prompt<br>
+          2. 发给任意 AI（ChatGPT · 豆包 · Kimi · DeepSeek…）<br>
+          3. 把返回的 JSON 粘贴回下面
         </div>
-        <div style="display:flex;gap:8px;margin-top:10px">
+        <div style="display:flex;gap:8px;margin-top:12px">
           <button class="btn btn-primary" id="genPromptBtn">生成提取指令</button>
           <button class="btn btn-ghost" id="copyPromptBtn">复制指令</button>
         </div>
         <label>粘贴 AI 返回的 JSON</label>
-        <textarea id="jsonInput" placeholder='{"title":"...","content":"...","todos":[...]}'></textarea>
+        <textarea id="jsonInput" placeholder='{"title":"…","content":"…","todos":[…]}'></textarea>
         <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px">
           <span class="status" id="jsonStatus"></span>
           <button class="btn btn-primary" id="applyJsonBtn">应用并生成预览</button>
@@ -273,33 +409,38 @@ footer a{color:var(--brand);text-decoration:none}
 
   <!-- 右侧：预览与导出 -->
   <div class="panel">
-    <h2><span class="step-no">3</span>预览与导出<span class="hint">单元格可直接点击编辑</span></h2>
+    <h2><span class="step">03</span>预览与导出<span class="hint">单元格可直接点击编辑</span></h2>
     <div id="resultFrame">
       <div class="empty-state">
-        <div class="icon">📝</div>
-        <div>暂无内容</div>
-        <div class="small" style="margin-top:6px">请在左侧导入转录稿并生成</div>
+        <div class="icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+        </div>
+        <div class="title">暂无内容</div>
+        <div class="desc">请在左侧导入转录稿并生成</div>
       </div>
     </div>
 
     <div class="footer-actions">
       <span class="spacer"></span>
       <span class="status" id="exportStatus"></span>
-      <button class="btn btn-ghost" id="editToggle" disabled>✎ 编辑模式</button>
-      <button class="btn btn-ok" id="exportExcelBtn" disabled>⬇ 导出 Excel 纪要</button>
+      <button class="btn btn-ghost" id="editToggle" disabled>编辑模式</button>
+      <button class="btn btn-ok" id="exportExcelBtn" disabled>
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        导出 Excel 纪要
+      </button>
     </div>
   </div>
 </div>
 
 <footer>
-  by <a href="https://github.com/" target="_blank">识野Insight</a> · 让 AI 干脏活
+  <span class="sig">by 识野Insight · Crafted with care</span>
 </footer>
 
 <!-- 指令弹窗 -->
 <div class="modal-mask" id="promptModal">
   <div class="modal">
-    <h3>✅ 提取指令已复制到剪贴板</h3>
-    <div class="small" style="margin-bottom:10px;color:var(--sub)">把下面整段发给任意 AI，把返回 JSON 粘贴回左侧输入框即可</div>
+    <h3>提取指令已复制到剪贴板</h3>
+    <div style="font-size:12px;color:var(--text-3);margin-bottom:12px">把下面整段发给任意 AI，把返回 JSON 粘贴回左侧输入框即可</div>
     <pre class="hint" id="promptText"></pre>
     <div class="close-row">
       <button class="btn btn-primary" id="closeModalBtn">关闭</button>
@@ -309,7 +450,7 @@ footer a{color:var(--brand);text-decoration:none}
 
 <script src="template_embed.js"></script>
 <script>
-/* ==================== 全局状态 ==================== */
+/* ==================== 状态 ==================== */
 const S = {
   rawText: "",
   transcriptFile: "",
@@ -357,7 +498,7 @@ function ingest(raw, filename){
   S.meta.time = guessDate(filename);
   S.meta.attendees = p.attendees;
   S.meta.recorder = "识野AI纪要";
-  S.meta.reporter = "";  // 不填
+  S.meta.reporter = "";
 
   $("fileMeta").innerHTML = `
     <div class="meta-card">
@@ -393,7 +534,7 @@ $("usePasteBtn").onclick = () => {
   ingest(t, "");
 };
 
-/* ==================== Tab 切换 ==================== */
+/* ==================== Tab ==================== */
 $("tabApi").onclick = () => switchTab("api");
 $("tabPaste").onclick = () => switchTab("paste");
 function switchTab(which){
@@ -406,6 +547,8 @@ function switchTab(which){
 /* preset 按钮 */
 document.querySelectorAll(".preset-btn").forEach(btn=>{
   btn.onclick = () => {
+    document.querySelectorAll(".preset-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
     const p = JSON.parse(btn.dataset.preset);
     $("apiBase").value = p.base;
     $("apiModel").value = p.model;
@@ -413,13 +556,17 @@ document.querySelectorAll(".preset-btn").forEach(btn=>{
   };
 });
 
-/* 恢复 API 配置 */
+/* 恢复 API 配置 + 默认 */
+if (!LS("apiBase")){
+  setLS("apiBase", "https://api.icompify.com/v1");
+  setLS("apiModel", "deepseek-v4-flash");
+}
 ["apiBase","apiKey","apiModel"].forEach(id => {
   $(id).value = LS(id);
   $(id).oninput = () => setLS(id, $(id).value);
 });
 
-/* ==================== Prompt 生成 ==================== */
+/* ==================== Prompt ==================== */
 function buildPrompt(){
   const metaLine = `会议标题：${S.meta.title}\n日期：${S.meta.time}\n参会人：${S.meta.attendees.join("、")}\n`;
   return `你是会议纪要专业撰写助手。下面是「${S.meta.title}」的会议转录稿（已按发言人清洗）。请阅读后，仅输出一个 JSON 对象，不要任何其他文字、不要 markdown 代码块。
@@ -495,7 +642,7 @@ function applyResult(o){
   $("editToggle").disabled = false;
 }
 
-/* ==================== 预览渲染 ==================== */
+/* ==================== 预览 ==================== */
 function renderResult(){
   const todosHtml = S.todos.map((t,i)=>`
     <tr>
@@ -505,7 +652,6 @@ function renderResult(){
       <td style="width:110px;text-align:center" contenteditable="${S.editMode}" data-todo="${i}" data-f="due">${escapeHtml(t.due)}</td>
     </tr>`).join("");
 
-  // 内容行：议题标题加粗
   const contentHtml = S.content.split("\n").map(ln=>{
     const esc = escapeHtml(ln);
     if (/^[一二三四五六七八九十]、/.test(ln)) return `<span class="topic">${esc}</span>`;
@@ -558,16 +704,14 @@ function renderResult(){
   if (addBtn) addBtn.onclick = () => { S.todos.push({text:"",owner:"",due:""}); renderResult(); };
 }
 
-/* ==================== 编辑开关 ==================== */
 $("editToggle").onclick = () => {
   S.editMode = !S.editMode;
-  $("editToggle").textContent = S.editMode ? "✎ 编辑中" : "✎ 编辑模式";
+  $("editToggle").textContent = S.editMode ? "编辑中" : "编辑模式";
   renderResult();
 };
 
 /* ==================== API 直连 ==================== */
 function resolveApiUrl(input){
-  // 智能识别：输入可以是 https://host/v1 或 https://host/v1/chat/completions
   const u = input.replace(/\/+$/,"");
   if (/\/chat\/completions$/i.test(u)) return u;
   return u + "/chat/completions";
@@ -614,7 +758,7 @@ $("apiGenBtn").onclick = async () => {
   }
 };
 
-/* ==================== 导出 Excel ==================== */
+/* ==================== 导出 ==================== */
 function b64ToBuf(b64){
   const bin = atob(b64); const len = bin.length;
   const bytes = new Uint8Array(len);
@@ -623,7 +767,6 @@ function b64ToBuf(b64){
 }
 function calcLines(text, colSpan){
   const total = colSpan.reduce((s,c)=>s + (COL_WIDTHS[c]||20), 0);
-  // Excel 列宽单位是「0 字符数」，汉字宽度 ≈ 2 倍
   const charsPerLine = total / 2;
   const lines = String(text||"").split("\n");
   let n = 0;
@@ -636,10 +779,8 @@ function calcLines(text, colSpan){
 }
 
 function parseDue(due){
-  // 返回 {serial, isDate} 或原字符串；避免本地时区 vs UTC 的天数偏移
   const m = String(due||"").match(/^(\d{4})[-\/年](\d{1,2})[-\/月](\d{1,2})/);
   if (m){
-    // Excel 序列号：从 1899-12-30 起算的天数（UTC）
     const utc = Date.UTC(+m[1], +m[2]-1, +m[3]);
     const serial = (utc / 86400000) + 25569;
     return { serial, isDate: true };
@@ -655,56 +796,56 @@ $("exportExcelBtn").onclick = async () => {
     await wb.xlsx.load(b64ToBuf(TEMPLATE_B64));
     const ws = wb.getWorksheet("会议纪要") || wb.worksheets[0];
 
-    // R1 标题
     ws.getCell("A1").value = S.meta.title;
     ws.getRow(1).height = 24;
 
-    // R2 时间 / 汇报人(空)
     ws.getCell("B2").value = S.meta.time;
     ws.getCell("E2").value = S.meta.reporter || "";
     ws.getRow(2).height = 18;
 
-    // R3 参会人
     ws.getCell("B3").value = Array.isArray(S.meta.attendees)?S.meta.attendees.join("、"):S.meta.attendees;
     ws.getRow(3).height = Math.max(18, calcLines(ws.getCell("B3").value, ['B','C','D','E']) * 14);
 
-    // R4 请假 / 纪要人（已固定）
     ws.getCell("B4").value = S.meta.absentees;
     ws.getCell("D4").value = "识野AI纪要";
     ws.getRow(4).height = 18;
 
-    // R5 节标
     ws.getRow(5).height = 20;
 
-    // R6 内容：纯字符串；议题标题行在 preview 加粗
     ws.getCell("A6").value = S.content;
     ws.getCell("A6").font = { name:'微软雅黑', size:10, bold:false };
-    // 行高：12pt/行（对标真人版 11.3pt/行）+ 4pt padding
     const lineCount = calcLines(S.content, ['A','B','C','D','E']);
     ws.getRow(6).height = Math.min(450, Math.max(60, lineCount * 12 + 4));
 
-    // R7 待办表头
     ws.getRow(7).height = 20;
 
-    // 待办
     const todos = S.todos.filter(t=>t.text.trim());
     todos.forEach((t,i)=>{
       const row = 8 + i;
-      ws.getCell(`A${row}`).value = i+1;
+      const aCell = ws.getCell(`A${row}`);
+      aCell.value = i+1;
+      aCell.numFmt = "0";           // 修复：避免继承日期格式
+      aCell.font = { name:'微软雅黑', size:10 };
+      aCell.alignment = { horizontal:'center', vertical:'center', wrapText:true };
       ws.getCell(`B${row}`).value = t.text;
       ws.getCell(`D${row}`).value = t.owner;
       const due = parseDue(t.due);
-      const dueCell = ws.getCell(`E${row}`);
+      const eCell = ws.getCell(`E${row}`);
       if (due.isDate){
-        dueCell.value = due.serial;
-        dueCell.numFmt = "yyyy/m/d";
+        eCell.value = due.serial;
+        eCell.numFmt = "yyyy/m/d";
       } else {
-        dueCell.value = due.raw;
+        eCell.value = due.raw;
+        eCell.numFmt = "@";
       }
+      eCell.font = { name:'微软雅黑', size:10 };
+      eCell.alignment = { horizontal:'center', vertical:'center', wrapText:true };
       ws.getRow(row).height = Math.max(18, calcLines(t.text, ['B','C']) * 14 + 4);
     });
     for (let i=todos.length; i<4; i++){
-      ws.getCell(`A${8+i}`).value = i+1;
+      const aCell = ws.getCell(`A${8+i}`);
+      aCell.value = i+1;
+      aCell.numFmt = "0";
       ws.getRow(8+i).height = 18;
     }
     // 超过 4 行补格式
@@ -722,6 +863,7 @@ $("exportExcelBtn").onclick = async () => {
           cell.border = { top:thin, left:thin, bottom:thin, right:thin };
         });
         ws.mergeCells(`B${rowNum}:C${rowNum}`);
+        ws.getCell(`A${rowNum}`).numFmt = "0";
       }
     }
 
