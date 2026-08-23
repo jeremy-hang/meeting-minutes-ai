@@ -92,17 +92,21 @@ body{
 @media (max-width:768px){
   .topbar{height:auto}
   .topbar-inner{
-    flex-direction:column;align-items:flex-start;
-    height:auto;padding:14px 16px;gap:10px;
+    flex-wrap:wrap;
+    height:auto;padding:14px 16px;gap:8px 12px;
   }
-  .topbar .brand-name{font-size:14px;width:100%}
+  .logo-mark{flex:none}
+  .topbar .brand-name{
+    font-size:14px;flex:1;min-width:0;
+    flex-wrap:wrap;gap:6px;
+  }
   .topbar .brand-tag{
     border-left:none;padding-left:0;margin-left:0;
-    font-size:11px;display:block;width:100%;
+    font-size:11px;flex:1 1 100%;order:3;
     white-space:normal;line-height:1.5;
   }
   .topbar .spacer{display:none}
-  .by-credit{font-size:11px;align-self:flex-end}
+  .by-credit{font-size:11px;margin-left:auto;order:4}
   .layout{padding:12px 14px 40px}
   .panel{padding:14px}
   .panel h2{font-size:12px}
