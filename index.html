@@ -798,7 +798,7 @@ function renderResult(){
       <tr><td colspan="6" class="titlecell" contenteditable="${S.editMode}" data-meta="title">${escapeHtml(S.meta.title)}</td></tr>
       <tr>
         <td class="tcell" style="width:110px">时间 (Time)</td>
-        <td colspan="2" contenteditable="${S.editMode}" data-meta="time">${escapeHtml(S.meta.time)}</td>
+        <td contenteditable="${S.editMode}" data-meta="time">${escapeHtml(S.meta.time)}</td>
         <td class="tcell" style="width:110px">地点 (Location)</td>
         <td contenteditable="${S.editMode}" data-meta="location">${escapeHtml(S.meta.location || "线上")}</td>
         <td class="tcell" style="width:130px">汇报人 (Reporter)</td>
@@ -810,9 +810,9 @@ function renderResult(){
       </tr>
       <tr>
         <td class="tcell">请假人（Absentees）</td>
-        <td colspan="2" contenteditable="${S.editMode}" data-meta="absentees">${escapeHtml(S.meta.absentees)}</td>
+        <td colspan="3" contenteditable="${S.editMode}" data-meta="absentees">${escapeHtml(S.meta.absentees)}</td>
         <td class="tcell">纪要人（Recorder）</td>
-        <td colspan="2">${escapeHtml(S.meta.recorder)}</td>
+        <td>${escapeHtml(S.meta.recorder)}</td>
       </tr>
       <tr><td colspan="6" class="tcell" style="background:#e8e8ed;font-weight:700">会议内容及决定</td></tr>
       <tr><td colspan="6" class="content-body" contenteditable="${S.editMode}" id="contentCell">${contentHtml}</td></tr>
