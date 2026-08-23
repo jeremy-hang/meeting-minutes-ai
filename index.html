@@ -1064,6 +1064,7 @@ $("exportExcelBtn").onclick = async () => {
 
     ws.getCell("B2").value = S.meta.time;
     // 人版 6 列：A2=时间 B2=时间值 C2=地点 D2=地点值 E2=汇报人 F2=汇报人值（AI 版留空）
+    ws.getCell("D2").value = "线上";
     ws.getRow(2).height = 18;
 
     ws.getCell("B3").value = Array.isArray(S.meta.attendees)?S.meta.attendees.join("、"):S.meta.attendees;
