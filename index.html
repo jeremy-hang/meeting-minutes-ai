@@ -76,7 +76,9 @@ body{
 .topbar .spacer{flex:1}
 .by-credit{
   font-size:12px;color:var(--text-2);letter-spacing:.01em;font-weight:400;
+  text-decoration:none;transition:color .15s;
 }
+.by-credit:hover{color:var(--brand);}
 
 /* ============ Layout ============ */
 .layout{
@@ -352,8 +354,9 @@ footer{
   background:rgba(251,251,253,.5);
 }
 footer .sig{
-  letter-spacing:.01em;
+  letter-spacing:.01em;color:inherit;text-decoration:none;transition:color .15s;
 }
+footer .sig:hover{color:var(--brand);}
 </style>
 </head>
 <body>
@@ -365,7 +368,7 @@ footer .sig{
     </div>
     <div class="brand-name">识野 AI 会议纪要<span class="brand-tag">上传会议转录 · AI 一键生成 · 直接导出标准会议纪要</span></div>
     <div class="spacer"></div>
-    <div class="by-credit">by 识野Insight</div>
+    <a class="by-credit" href="https://github.com/jeremy-hang/meeting-minutes-ai" target="_blank" rel="noopener" title="GitHub 仓库">by 识野Insight</a>
   </div>
 </div>
 
@@ -505,7 +508,7 @@ footer .sig{
 </div>
 
 <footer>
-  <span class="sig">by 识野Insight</span>
+  <a class="sig" href="https://github.com/jeremy-hang/meeting-minutes-ai" target="_blank" rel="noopener" title="GitHub 仓库">by 识野Insight</a>
 </footer>
 
 <!-- 指令弹窗 -->
