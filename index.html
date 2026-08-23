@@ -366,7 +366,7 @@ footer .sig:hover{color:var(--brand);}
     <div class="logo-mark">
       <svg viewBox="0 0 24 24"><path d="M5 4h14M5 12h14M5 20h9"/></svg>
     </div>
-    <div class="brand-name">识野 AI 会议纪要<span class="brand-tag">上传会议转录 · AI 一键生成 · 直接导出标准会议纪要</span></div>
+    <div class="brand-name">识野 AI 会议纪要<span class="brand-tag">v18 · 上传会议转录 · AI 一键生成 · 直接导出标准会议纪要</span></div>
     <div class="spacer"></div>
     <a class="by-credit" href="https://github.com/jeremy-hang/meeting-minutes-ai" target="_blank" rel="noopener" title="GitHub 仓库">by 识野Insight</a>
   </div>
@@ -1119,9 +1119,7 @@ $("exportExcelBtn").onclick = async () => {
     ws.getRow(1).height = 24;
 
     ws.getCell("B2").value = S.meta.time;
-    // R2 汇报人占 D2 一格 header + E2 一格值；为和 R4 右边 3 格区间对齐，D2:E2 合并给值横向空间
-    ws.mergeCells("D2:E2");
-    ws.getCell("E2").value = S.meta.reporter || "";
+    // R2 汇报人：D2 灰底标题（模板自带），E2 空白值框（真人版可手填，AI 版留空）——不 merge，与人版完全一致
     ws.getRow(2).height = 18;
 
     ws.getCell("B3").value = Array.isArray(S.meta.attendees)?S.meta.attendees.join("、"):S.meta.attendees;
