@@ -448,25 +448,7 @@ footer .sig:hover{color:var(--brand);}
         <div class="proxy-tabs">
           <div id="proxyAuto" class="on"><span class="rec-dot"></span>自动</div>
           <div id="proxyDirect">直连</div>
-          <div id="proxyCors">公共代理</div>
-          <div id="proxyCustom">自有代理</div>
-        </div>
-        <div id="customProxyRow" style="display:none;margin-top:10px">
-          <input type="text" id="customProxyUrl" placeholder="你的代理地址，如 https://your-worker.workers.dev/?target=" readonly title="已内置代理，不可编辑">
-          <button class="btn btn-ghost" id="copyWorkerBtn" style="width:100%;margin-top:8px;font-size:12px;padding:7px 12px">
-            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            复制 Cloudflare Worker 代理代码（免费部署）
-          </button>
-          <button class="btn btn-ghost" id="saveProxyDefaultBtn" style="width:100%;margin-top:8px;font-size:12px;padding:7px 12px">
-            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
-            存为内置默认（改源码常量，重启页面仍保留）
-          </button>
-        </div>
-        <div class="proxy-note">
-          <b>自动</b>（默认推荐）：先直连，被拦依次走 5 个公共代理<br>
-          <b>直连</b>：DeepSeek · 千问 · Kimi · 智谱 支持，最快且不经第三方<br>
-          <b>公共代理</b>：积算平台等不支持浏览器调用的服务器，Key 经第三方公共服务<br>
-          <b>自有代理</b>： safest——自己架 Cloudflare Worker（免费），Key 只经你自己的服务
+          <div id="proxyCustom">默认代理</div>
         </div>
 
         <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px">
@@ -478,7 +460,7 @@ footer .sig:hover{color:var(--brand);}
         </div>
         <div style="margin-top:10px;font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:6px">
           <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;flex:none"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          Key 仅存浏览器本地，不会外发（自动/公共代理模式下会经第三方，自有代理模式只经你的服务）
+          Key 仅存浏览器本地，不会外发
         </div>
       </div>
 
@@ -659,19 +641,18 @@ function switchTab(which){
 }
 
 /* ==================== Proxy Tabs ==================== */
+/* 公共代理已下线：把存量用户的 cors 偏好迁到 auto */
 let proxyMode = LS("proxyMode") || "auto";
+if (proxyMode === "cors") proxyMode = "auto";
 function setProxyTab(m){
   proxyMode = m;
   setLS("proxyMode", m);
   $("proxyAuto").className = m==="auto" ? "on" : "";
   $("proxyDirect").className = m==="direct" ? "on" : "";
-  $("proxyCors").className = m==="cors" ? "on" : "";
   $("proxyCustom").className = m==="custom" ? "on" : "";
-  $("customProxyRow").style.display = m==="custom" ? "block" : "none";
 }
 $("proxyAuto").onclick = () => setProxyTab("auto");
 $("proxyDirect").onclick = () => setProxyTab("direct");
-$("proxyCors").onclick = () => setProxyTab("cors");
 $("proxyCustom").onclick = () => setProxyTab("custom");
 setProxyTab(proxyMode);
 
@@ -679,74 +660,7 @@ setProxyTab(proxyMode);
  * 想做成"内置"：把下面这行改成你自己的 Worker 地址，部署后别人拿到即自带代理
  * 只改这里即可，用户端不填地址也能直接用「自有代理」模式 */
 const DEFAULT_CUSTOM_PROXY = "https://cors-proxy-minutes.hangchuanlong.workers.dev/?target=";
-/* 自定义代理输入容错：只接受 http(s) URL，粘错内容（如 Worker 源代码）时回退内置默认 */
-/* 代理输入框 readonly 内置：永远显示 DEFAULT_CUSTOM_PROXY，不进 localStorage，杜绝脏数据和误改 */
-localStorage.removeItem("mmv2_customProxyUrl");
-$("customProxyUrl").value = DEFAULT_CUSTOM_PROXY;
-
-/* Cloudflare Worker 代理代码模板 */
-const WORKER_SRC = `// Cloudflare Worker CORS 代理 - 部署在 https://workers.cloudflare.com/
-// 免费额度：100,000 请求/天，足够个人用
-// 1. 登录 https://dash.cloudflare.com/ -> Workers & Pages -> Create Worker
-// 2. 粘贴下面整段代码，点 Deploy
-// 3. 把生成的 https://your-worker.your-subdomain.workers.dev/?target= 填到左侧「自有代理」
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request));
-});
-async function handleRequest(request) {
-  const url = new URL(request.url);
-  const target = url.searchParams.get('target');
-  if (!target) return new Response('Missing ?target=', { status: 400 });
-  const targetUrl = new URL(target);
-
-  // OPTIONS 预检直接放行
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
-        'Access-Control-Allow-Headers': '*',
-        'Access-Control-Max-Age': '86400'
-      }
-    });
-  }
-
-  const proxyReq = new Request(targetUrl, {
-    method: request.method,
-    headers: request.headers,
-    body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.text() : undefined
-  });
-  proxyReq.headers.delete('host');
-
-  try {
-    const proxyResp = await fetch(proxyReq);
-    const resp = new Response(proxyResp.body, proxyResp);
-    resp.headers.set('Access-Control-Allow-Origin', '*');
-    resp.headers.set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-    resp.headers.set('Access-Control-Allow-Headers', '*');
-    return resp;
-  } catch (e) {
-    return new Response('Proxy error: ' + e.message, { status: 502 });
-  }
-}`;
-$("copyWorkerBtn").onclick = () => {
-  navigator.clipboard.writeText(WORKER_SRC).then(()=>{
-    $("copyWorkerBtn").innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> 已复制 Worker 代码`;
-    setTimeout(()=>{
-      $("copyWorkerBtn").innerHTML = `<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> 复制 Cloudflare Worker 代理代码（免费部署）`;
-    }, 2000);
-  });
-};
-
-/* 已内置默认：纯提示状态（输入框 readonly 后此按钮无实际操作） */
-$("saveProxyDefaultBtn").onclick = () => {
-  const btn = $("saveProxyDefaultBtn");
-  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> 已内置，无需保存`;
-  setTimeout(()=>{
-    btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> 存为内置默认（改源码常量，重启页面仍保留）`;
-  }, 2000);
-};
+/* 内置代理硬写：界面隐藏地址细节，不进 localStorage */
 
 /* preset 按钮 */
 document.querySelectorAll(".preset-btn").forEach(btn=>{
@@ -1075,7 +989,6 @@ $("apiGenBtn").onclick = async () => {
     } else if (e.code === "NO_CUSTOM_PROXY"){
       st.className="status err";
       st.textContent="✗ " + e.message;
-      $("customProxyUrl").focus();
     } else {
       st.className="status err";
       st.textContent="✗ " + (e.message || String(e)).slice(0,150);
@@ -1135,9 +1048,8 @@ $("exportExcelBtn").onclick = async () => {
     ws.getRow(3).height = Math.max(18, calcLines(ws.getCell("B3").value, ['B','C','D','E']) * 14);
 
     ws.getCell("B4").value = S.meta.absentees;
-    const d4 = ws.getCell("D4");
-    d4.value = "识野AI纪要";
-    d4.alignment = { horizontal:'left', vertical:'center' };
+    // D4 模板本来就是 D4:E4 合并的居中框，赋值即可，不要再覆盖 alignment（人版一致）
+    ws.getCell("D4").value = "识野AI纪要";
     ws.getRow(4).height = 18;
 
     ws.getRow(5).height = 20;
