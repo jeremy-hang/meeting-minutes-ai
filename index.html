@@ -366,7 +366,7 @@ footer .sig:hover{color:var(--brand);}
     <div class="logo-mark">
       <svg viewBox="0 0 24 24"><path d="M5 4h14M5 12h14M5 20h9"/></svg>
     </div>
-    <div class="brand-name">识野 AI 会议纪要<span class="brand-tag">v19 · 上传会议转录 · AI 一键生成 · 直接导出标准会议纪要</span></div>
+    <div class="brand-name">识野 AI 会议纪要<span class="brand-tag">v20 · 上传会议转录 · AI 一键生成 · 直接导出标准会议纪要</span></div>
     <div class="spacer"></div>
     <a class="by-credit" href="https://github.com/jeremy-hang/meeting-minutes-ai" target="_blank" rel="noopener" title="GitHub 仓库">by 识野Insight</a>
   </div>
@@ -419,8 +419,8 @@ footer .sig:hover{color:var(--brand);}
         <div id="icompifyNote" style="display:none"></div>
         <label>API 地址<span style="text-transform:none;color:var(--text-mute);font-weight:400">（支持 base 或完整 /chat/completions 均可）</span></label>
         <input type="text" id="apiBase" placeholder="https://api.deepseek.com/v1">
-        <label>API Key</label>
-        <input type="password" id="apiKey" placeholder="sk-…">
+        <label>API Key <button type="button" id="clearKeyBtn" style="float:right;background:none;border:none;color:var(--brand);font-size:11px;cursor:pointer;padding:0">清空</button></label>
+        <input type="password" id="apiKey" placeholder="sk-…" autocomplete="off" data-lpignore="true" data-1p-ignore="true">
         <label>模型名</label>
         <input type="text" id="apiModel" placeholder="deepseek-chat">
 
@@ -660,22 +660,9 @@ setProxyTab(proxyMode);
  * 只改这里即可，用户端不填地址也能直接用「自有代理」模式 */
 const DEFAULT_CUSTOM_PROXY = "https://cors-proxy-minutes.hangchuanlong.workers.dev/?target=";
 /* 自定义代理输入容错：只接受 http(s) URL，粘错内容（如 Worker 源代码）时回退内置默认 */
-function sanitizeCustomProxy(){
-  let v = LS("customProxyUrl");
-  if (v && !/^https?:\/\//i.test(v.trim())){
-    localStorage.removeItem("customProxyUrl");
-    v = null;
-  }
-  const fallback = v || DEFAULT_CUSTOM_PROXY;
-  $("customProxyUrl").value = fallback;
-  return DEFAULT_CUSTOM_PROXY;
-}
-$("customProxyUrl").value = sanitizeCustomProxy();
-$("customProxyUrl").oninput = () => {
-  const v = $("customProxyUrl").value.trim();
-  if (/^https?:\/\//i.test(v)) setLS("customProxyUrl", v);
-  else if (!v) localStorage.removeItem("customProxyUrl");
-};
+/* 代理输入框 readonly 内置：永远显示 DEFAULT_CUSTOM_PROXY，不进 localStorage，杜绝脏数据和误改 */
+localStorage.removeItem("mmv2_customProxyUrl");
+$("customProxyUrl").value = DEFAULT_CUSTOM_PROXY;
 
 /* Cloudflare Worker 代理代码模板 */
 const WORKER_SRC = `// Cloudflare Worker CORS 代理 - 部署在 https://workers.cloudflare.com/
@@ -732,15 +719,10 @@ $("copyWorkerBtn").onclick = () => {
   });
 };
 
-/* 存为内置默认：把当前输入的内置地址写进源码常量（调 build_script 重新生成即可永久内置）
- * 这个按钮做"当前浏览器会话记住"，真正"内置到源码"由 build 脚本占位符替换完成 */
+/* 已内置默认：纯提示状态（输入框 readonly 后此按钮无实际操作） */
 $("saveProxyDefaultBtn").onclick = () => {
-  const v = $("customProxyUrl").value.trim();
-  if (!v){ alert("先在上方填入你的代理地址"); return; }
-  setLS("customProxyUrl", v);
-  setLS("proxyBuiltin", "1"); // 标记已存为内置
   const btn = $("saveProxyDefaultBtn");
-  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> 已保存为默认`;
+  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> 已内置，无需保存`;
   setTimeout(()=>{
     btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> 存为内置默认（改源码常量，重启页面仍保留）`;
   }, 2000);
@@ -767,10 +749,17 @@ if (!LS("apiBase")){
   setLS("apiModel", "deepseek-chat");
 }
 updateIcompifyNote(LS("apiBase"));
-["apiBase","apiKey","apiModel"].forEach(id => {
+/* Key 不持久化：仅 apiBase/apiModel 记住，apiKey 每次手动输入（防他人共用浏览器看到上次 Key） */
+["apiBase","apiModel"].forEach(id => {
   $(id).value = LS(id);
   $(id).oninput = () => setLS(id, $(id).value);
 });
+$("apiKey").value = "";
+localStorage.removeItem("mmv2_apiKey");
+$("clearKeyBtn").onclick = () => {
+  $("apiKey").value = "";
+  $("apiKey").focus();
+};
 
 /* ==================== Prompt ==================== */
 function buildPrompt(){
@@ -971,7 +960,7 @@ function buildCustomProxyUrl(base){
 }
 
 async function apiCallWithProxy(directUrl, payload, key, mode, onPhase){
-  const customBase = (mode === "custom") ? buildCustomProxyUrl(LS("customProxyUrl")) : null;
+  const customBase = (mode === "custom") ? buildCustomProxyUrl(DEFAULT_CUSTOM_PROXY) : null;
 
   if (mode === "custom"){
     if (!customBase){
