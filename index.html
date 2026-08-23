@@ -1090,8 +1090,8 @@ $("exportExcelBtn").onclick = async () => {
       const aCell = ws.getCell(`A${row}`);
       aCell.value = null;
       aCell.numFmt = "General";  // 强制清空可能继承的日期 numFmt
-      aCell.value = i+1;
-      aCell.numFmt = "0";
+      aCell.value = "No." + (i+1);
+      aCell.numFmt = "@";
       aCell.font = { name:'微软雅黑', size:10 };
       aCell.alignment = { horizontal:'center', vertical:'center', wrapText:true };
       ws.getCell(`B${row}`).value = t.text;
@@ -1116,8 +1116,8 @@ $("exportExcelBtn").onclick = async () => {
       const aCell = ws.getCell(`A${8+i}`);
       aCell.value = null;
       aCell.numFmt = "General";
-      aCell.value = i+1;
-      aCell.numFmt = "0";
+      aCell.value = "No." + (i+1);
+      aCell.numFmt = "@";
       ws.getRow(8+i).height = 18;
     }
     if (todos.length > 4){
@@ -1136,7 +1136,7 @@ $("exportExcelBtn").onclick = async () => {
         const axCell = ws.getCell(`A${rowNum}`);
         axCell.value = null;
         axCell.numFmt = "General";
-        axCell.numFmt = "0";
+        axCell.numFmt = "@";
         ws.mergeCells(`B${rowNum}:D${rowNum}`);
       }
     }
