@@ -60,6 +60,18 @@ API Key 仅存储在浏览器 `localStorage`，不会发送到任何服务器。
 
 完成后自有代理地址形如 `https://my-cors-proxy.your-subdomain.workers.dev/?target=`，系统会自动拼上 API 目标 URL。这样 Key 只经你自己的 Cloudflare Worker，彻底安全。
 
+### 内置你的代理（团队分发）
+
+想让别人拿到 `index.html` 就自带你的代理（不用填地址），打开 `index.html` 找到这行：
+
+```js
+const DEFAULT_CUSTOM_PROXY = ""; // 例："https://my-cors-proxy.your-subdomain.workers.dev/?target="
+```
+
+把引号里填上你的 Worker 地址，保存后再部署/分发。此后任何人打开这个文件，点「自有代理」都会自动带出这个地址，不用再配置。单人或试验也可先用「存为默认」按钮（仅记住在本浏览器）。
+
+> ⚠️ 若把这个内置代理版本公开发到 GitHub Pages，等于所有人共用你的 Worker、Key 都经你服务器——只适合团队内部分发，不适合公网公开。
+
 若"自动"模式下所有路线都失败（公共代理不稳定），系统自动切换「手动粘贴」tab 并复制好 prompt——发给任意 AI 粘回 JSON 即可，永远不会卡死。
 
 ## 📐 会议纪要规范
