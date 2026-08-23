@@ -88,6 +88,26 @@ body{
 }
 @media (max-width:1100px){ .layout{grid-template-columns:1fr;padding:16px} }
 
+/* ============ 竖屏 / 移动端 ============ */
+@media (max-width:768px){
+  .topbar{height:auto}
+  .topbar-inner{
+    flex-direction:column;align-items:flex-start;
+    height:auto;padding:14px 16px;gap:10px;
+  }
+  .topbar .brand-name{font-size:14px;width:100%}
+  .topbar .brand-tag{
+    border-left:none;padding-left:0;margin-left:0;
+    font-size:11px;display:block;width:100%;
+    white-space:normal;line-height:1.5;
+  }
+  .topbar .spacer{display:none}
+  .by-credit{font-size:11px;align-self:flex-end}
+  .layout{padding:12px 14px 40px}
+  .panel{padding:14px}
+  .panel h2{font-size:12px}
+}
+
 /* ============ Panel ============ */
 .panel{
   background:var(--bg-card);
@@ -366,7 +386,7 @@ footer .sig:hover{color:var(--brand);}
     <div class="logo-mark">
       <svg viewBox="0 0 24 24"><path d="M5 4h14M5 12h14M5 20h9"/></svg>
     </div>
-    <div class="brand-name">识野 AI 会议纪要<span class="brand-tag">v20 · 上传会议转录 · AI 一键生成 · 直接导出标准会议纪要</span></div>
+    <div class="brand-name">识野 AI 会议纪要<span class="brand-tag">v21 · 上传会议转录 · AI 一键生成 · 直接导出标准会议纪要</span></div>
     <div class="spacer"></div>
     <a class="by-credit" href="https://github.com/jeremy-hang/meeting-minutes-ai" target="_blank" rel="noopener" title="GitHub 仓库">by 识野Insight</a>
   </div>
