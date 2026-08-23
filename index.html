@@ -898,19 +898,22 @@ function buildCustomProxyUrl(base){
 }
 
 async function apiCallWithProxy(directUrl, payload, key, mode, onPhase){
-  const customBase = (mode === "custom") ? buildCustomProxyUrl(DEFAULT_CUSTOM_PROXY) : null;
-
-  if (mode === "custom"){
-    if (!customBase){
-      const err = new Error("先在上方输入你的自有代理地址，或点「复制 Cloudflare Worker 代理代码」自行部署");
-      err.code = "NO_CUSTOM_PROXY";
-      throw err;
-    }
+  const customBase = DEFAULT_CUSTOM_PROXY ? buildCustomProxyUrl(DEFAULT_CUSTOM_PROXY) : null;
+  const callCustom = async () => {
     const target = customBase.includes("{url}")
       ? customBase.replace("{url}", encodeURIComponent(directUrl))
       : customBase + encodeURIComponent(directUrl);
     onPhase("custom-proxy");
     return doFetch(target, payload, key, 150000);
+  };
+
+  if (mode === "custom"){
+    if (!customBase){
+      const err = new Error("代理未配置");
+      err.code = "NO_CUSTOM_PROXY";
+      throw err;
+    }
+    return callCustom();
   }
 
   if (mode !== "cors"){
@@ -920,13 +923,25 @@ async function apiCallWithProxy(directUrl, payload, key, mode, onPhase){
     } catch (e){
       const cors = isCorsErr(e);
       if (mode === "direct"){
-        e.message = e.message + (cors ? " — 浏览器跨域拦截（服务器不支持网页调用），请切「自动」或「公共代理」或「自有代理」" : "");
+        e.message = e.message + (cors ? " — 浏览器跨域拦截（服务器不支持网页调用），请切「自动」或「代理」" : "");
         throw e;
       }
       if (!cors) throw e;
       onPhase("fallback");
     }
   }
+
+  // 内置代理优先：Key 只经你自己的 Worker，不经第三方
+  if (customBase){
+    try {
+      return await callCustom();
+    } catch (e){
+      console.warn("[api] 内置代理失败，降级公共代理:", e.message || e);
+      onPhase("custom-fail");
+    }
+  }
+
+  // 内置代理挂时的兜底：公共代理
   let lastErr;
   for (let i = 0; i < CORS_PROXIES.length; i++){
     try {
@@ -934,7 +949,7 @@ async function apiCallWithProxy(directUrl, payload, key, mode, onPhase){
       return await doFetch(CORS_PROXIES[i](directUrl), payload, key, 150000);
     } catch (e){ lastErr = e; }
   }
-  const err = new Error("直连被跨域拦截，5 个公共代理也全部失效（免费代理不稳定）。试试「自有代理」或「手动粘贴」——已自动帮你切过去并生成好指令");
+  const err = new Error("直连被跨域拦截，内置代理和公共代理都失效。试试「手动粘贴」——已自动帮你切过去并生成好指令");
   err.suggestPaste = true;
   err.lastErr = lastErr;
   throw err;
@@ -964,13 +979,16 @@ $("apiGenBtn").onclick = async () => {
       (phase, idx) => {
         if (phase === "fallback"){
           st.className = "status warn";
-          st.innerHTML = '<span class="spin"></span> 直连被拦截，切换公共代理…';
+          st.innerHTML = '<span class="spin"></span> 直连被拦截，切换内置代理…';
+        } else if (phase === "custom-fail"){
+          st.className = "status warn";
+          st.innerHTML = '<span class="spin"></span> 内置代理暂时失效，降级公共代理…';
         } else if (phase === "proxy"){
           st.className = "status warn";
           st.innerHTML = `<span class="spin"></span> 公共代理 ${idx+1}/5 尝试中…`;
         } else if (phase === "custom-proxy"){
           st.className = "status ok";
-          st.innerHTML = `<span class="spin"></span> 经自有代理转发…`;
+          st.innerHTML = `<span class="spin"></span> 经内置代理转发…`;
         }
       }
     );
