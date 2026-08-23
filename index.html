@@ -659,8 +659,23 @@ setProxyTab(proxyMode);
  * 想做成"内置"：把下面这行改成你自己的 Worker 地址，部署后别人拿到即自带代理
  * 只改这里即可，用户端不填地址也能直接用「自有代理」模式 */
 const DEFAULT_CUSTOM_PROXY = "https://cors-proxy-minutes.hangchuanlong.workers.dev/?target=";
-$("customProxyUrl").value = LS("customProxyUrl") || DEFAULT_CUSTOM_PROXY;
-$("customProxyUrl").oninput = () => setLS("customProxyUrl", $("customProxyUrl").value);
+/* 自定义代理输入容错：只接受 http(s) URL，粘错内容（如 Worker 源代码）时回退内置默认 */
+function sanitizeCustomProxy(){
+  let v = LS("customProxyUrl");
+  if (v && !/^https?:\/\//i.test(v.trim())){
+    localStorage.removeItem("customProxyUrl");
+    v = null;
+  }
+  const fallback = v || DEFAULT_CUSTOM_PROXY;
+  $("customProxyUrl").value = fallback;
+  return DEFAULT_CUSTOM_PROXY;
+}
+$("customProxyUrl").value = sanitizeCustomProxy();
+$("customProxyUrl").oninput = () => {
+  const v = $("customProxyUrl").value.trim();
+  if (/^https?:\/\//i.test(v)) setLS("customProxyUrl", v);
+  else if (!v) localStorage.removeItem("customProxyUrl");
+};
 
 /* Cloudflare Worker 代理代码模板 */
 const WORKER_SRC = `// Cloudflare Worker CORS 代理 - 部署在 https://workers.cloudflare.com/
@@ -944,6 +959,11 @@ async function doFetch(url, payload, key, timeoutMs = 120000){
 function buildCustomProxyUrl(base){
   const b = (base || "").trim();
   if (!b) return null;
+  // 粘错内容（Worker 源码、说明文字等）不是 URL：静默回退到内置默认代理
+  if (!/^https?:\/\//i.test(b)){
+    if (DEFAULT_CUSTOM_PROXY) return buildCustomProxyUrl(DEFAULT_CUSTOM_PROXY);
+    return null;
+  }
   // 用户填的可能带占位符 {url} 或结尾的 ?target=
   if (b.includes("{url}")) return b;
   if (!b.endsWith("=") && !b.endsWith("/")) return b + (b.includes("?") ? "&target=" : "?target=");
