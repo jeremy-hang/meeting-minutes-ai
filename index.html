@@ -655,7 +655,7 @@ setProxyTab(proxyMode);
 /* 内置默认自有代理地址（可改 / 可覆盖）
  * 想做成"内置"：把下面这行改成你自己的 Worker 地址，部署后别人拿到即自带代理
  * 只改这里即可，用户端不填地址也能直接用「自有代理」模式 */
-const DEFAULT_CUSTOM_PROXY = ""; // 例："https://my-cors-proxy.your-subdomain.workers.dev/?target="
+const DEFAULT_CUSTOM_PROXY = "https://cors-proxy-minutes.hangchuanlong.workers.dev/?target=";
 $("customProxyUrl").value = LS("customProxyUrl") || DEFAULT_CUSTOM_PROXY;
 $("customProxyUrl").oninput = () => setLS("customProxyUrl", $("customProxyUrl").value);
 
