@@ -1052,8 +1052,8 @@ $("exportExcelBtn").onclick = async () => {
     ws.getRow(3).height = Math.max(18, calcLines(ws.getCell("B3").value, ['B','C','D','E']) * 14);
 
     ws.getCell("B4").value = S.meta.absentees;
-    // D4 模板本来就是 D4:E4 合并的居中框，赋值即可，不要再覆盖 alignment（人版一致）
-    ws.getCell("D4").value = "识野AI纪要";
+    // 纪要人标题在 D4（跟 R2 汇报人对齐 D 列），值在 E4——用户要求的布局
+    ws.getCell("E4").value = "识野AI纪要";
     ws.getRow(4).height = 18;
 
     ws.getRow(5).height = 20;
