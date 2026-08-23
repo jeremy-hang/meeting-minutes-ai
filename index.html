@@ -535,7 +535,7 @@ footer .sig:hover{color:var(--brand);}
 const S = {
   rawText: "",
   transcriptFile: "",
-  meta: { title:"", time:"", location:"", reporter:"", attendees:[], absentees:"无", recorder:"识野AI纪要" },
+  meta: { title:"", time:"", location:"线上", reporter:"", attendees:[], absentees:"无", recorder:"识野AI纪要" },
   content: "",
   todos: [],
   editMode: false
@@ -580,6 +580,7 @@ function ingest(raw, filename){
   S.meta.attendees = p.attendees;
   S.meta.recorder = "识野AI纪要";
   S.meta.reporter = "";
+  S.meta.location = "线上";
 
   const many = p.attendees.length > 0;
   $("fileMeta").innerHTML = `
@@ -701,7 +702,7 @@ $("clearKeyBtn").onclick = () => {
 
 /* ==================== Prompt ==================== */
 function buildPrompt(){
-  const metaLine = `会议标题：${S.meta.title}\n日期：${S.meta.time}\n参会人：${S.meta.attendees.join("、")}\n`;
+  const metaLine = `会议标题：${S.meta.title}\n日期：${S.meta.time}\n地点：${S.meta.location || "线上"}\n参会人：${S.meta.attendees.join("、")}\n`;
   return `你是会议纪要专业撰写助手。下面是「${S.meta.title}」的会议转录稿（已按发言人清洗）。请阅读后，仅输出一个 JSON 对象，不要任何其他文字、不要 markdown 代码块。
 
 JSON 结构（**严格**）：
@@ -767,6 +768,7 @@ function applyResult(o){
   S.meta.absentees = o.absentees || "无";
   S.meta.reporter = "";
   S.meta.recorder = "识野AI纪要";
+  S.meta.location = o.location || S.meta.location || "线上";
   S.content = o.content || "";
   S.todos = Array.isArray(o.todos) ? o.todos.slice(0,12).map(t=>({text:String(t.text||""),owner:String(t.owner||""),due:String(t.due||"待定")})) : [];
   while (S.todos.length < 3) S.todos.push({text:"",owner:"",due:""});
@@ -779,8 +781,8 @@ function applyResult(o){
 function renderResult(){
   const todosHtml = S.todos.map((t,i)=>`
     <tr>
-      <td style="text-align:center">${i+1}</td>
-      <td colspan="2" contenteditable="${S.editMode}" data-todo="${i}" data-f="text">${escapeHtml(t.text)}</td>
+      <td style="text-align:center">No.${i+1}</td>
+      <td colspan="3" contenteditable="${S.editMode}" data-todo="${i}" data-f="text">${escapeHtml(t.text)}</td>
       <td style="width:140px;text-align:center" contenteditable="${S.editMode}" data-todo="${i}" data-f="owner">${escapeHtml(t.owner)}</td>
       <td style="width:110px;text-align:center" contenteditable="${S.editMode}" data-todo="${i}" data-f="due">${escapeHtml(t.due)}</td>
     </tr>`).join("");
@@ -793,28 +795,30 @@ function renderResult(){
 
   $("resultFrame").innerHTML = `
     <table class="mtable">
-      <tr><td colspan="5" class="titlecell" contenteditable="${S.editMode}" data-meta="title">${escapeHtml(S.meta.title)}</td></tr>
+      <tr><td colspan="6" class="titlecell" contenteditable="${S.editMode}" data-meta="title">${escapeHtml(S.meta.title)}</td></tr>
       <tr>
-        <td class="tcell" style="width:130px">时间(Time)</td>
+        <td class="tcell" style="width:110px">时间 (Time)</td>
         <td colspan="2" contenteditable="${S.editMode}" data-meta="time">${escapeHtml(S.meta.time)}</td>
-        <td class="tcell" style="width:130px">汇报人(Reporter)</td>
+        <td class="tcell" style="width:110px">地点 (Location)</td>
+        <td contenteditable="${S.editMode}" data-meta="location">${escapeHtml(S.meta.location || "线上")}</td>
+        <td class="tcell" style="width:130px">汇报人 (Reporter)</td>
         <td contenteditable="${S.editMode}" data-meta="reporter">${escapeHtml(S.meta.reporter)}</td>
       </tr>
       <tr>
-        <td class="tcell">参会人(Attendees)</td>
-        <td colspan="4" contenteditable="${S.editMode}" data-meta="attendees">${escapeHtml(Array.isArray(S.meta.attendees)?S.meta.attendees.join("、"):S.meta.attendees)}</td>
+        <td class="tcell">参会人 (Attendees)</td>
+        <td colspan="5" contenteditable="${S.editMode}" data-meta="attendees">${escapeHtml(Array.isArray(S.meta.attendees)?S.meta.attendees.join("、"):S.meta.attendees)}</td>
       </tr>
       <tr>
         <td class="tcell">请假人（Absentees）</td>
-        <td contenteditable="${S.editMode}" data-meta="absentees">${escapeHtml(S.meta.absentees)}</td>
+        <td colspan="2" contenteditable="${S.editMode}" data-meta="absentees">${escapeHtml(S.meta.absentees)}</td>
         <td class="tcell">纪要人（Recorder）</td>
         <td colspan="2">${escapeHtml(S.meta.recorder)}</td>
       </tr>
-      <tr><td colspan="5" class="tcell" style="background:#e8e8ed;font-weight:700">会议讨论内容要点及决议</td></tr>
-      <tr><td colspan="5" class="content-body" contenteditable="${S.editMode}" id="contentCell">${contentHtml}</td></tr>
+      <tr><td colspan="6" class="tcell" style="background:#e8e8ed;font-weight:700">会议内容及决定</td></tr>
+      <tr><td colspan="6" class="content-body" contenteditable="${S.editMode}" id="contentCell">${contentHtml}</td></tr>
       <tr>
-        <td class="tcell" style="text-align:center;width:48px">No.</td>
-        <td class="tcell" colspan="2">待办事项</td>
+        <td class="tcell" style="text-align:center;width:60px">No.</td>
+        <td class="tcell" colspan="3">待办事项</td>
         <td class="tcell" style="text-align:center">责任人(Owner)</td>
         <td class="tcell" style="text-align:center">完成时间</td>
       </tr>
@@ -1064,7 +1068,7 @@ $("exportExcelBtn").onclick = async () => {
 
     ws.getCell("B2").value = S.meta.time;
     // 人版 6 列：A2=时间 B2=时间值 C2=地点 D2=地点值 E2=汇报人 F2=汇报人值（AI 版留空）
-    ws.getCell("D2").value = "线上";
+    ws.getCell("D2").value = S.meta.location || "线上";
     ws.getRow(2).height = 18;
 
     ws.getCell("B3").value = Array.isArray(S.meta.attendees)?S.meta.attendees.join("、"):S.meta.attendees;
@@ -1124,6 +1128,8 @@ $("exportExcelBtn").onclick = async () => {
       const thin = {style:'thin'};
       for (let i=4; i<todos.length; i++){
         const rowNum = 8 + i;
+        // 模板自带 B8:D8...B11:D11 合并，超过 4 行的行必须先 unmerge 再重写
+        try { ws.unMergeCells(`B${rowNum}:D${rowNum}`); } catch(e){}
         ["A","B","C","D","E","F"].forEach(col=>{
           const cell = ws.getCell(col+rowNum);
           cell.font = { name:'微软雅黑', size:10 };
@@ -1133,13 +1139,16 @@ $("exportExcelBtn").onclick = async () => {
           };
           cell.border = { top:thin, left:thin, bottom:thin, right:thin };
         });
+        // No. 值已在 todos.forEach 主循环写入（"No.N" 字符串），这里只清 numFmt 防日期污染
         const axCell = ws.getCell(`A${rowNum}`);
-        axCell.value = null;
         axCell.numFmt = "General";
         axCell.numFmt = "@";
         ws.mergeCells(`B${rowNum}:D${rowNum}`);
       }
     }
+    // R3 参会人 merged 其他格补边框（ExcelJS merge 只给主格边框）
+    const b3Border = ws.getCell("B3").border;
+    ["C3","D3","E3","F3"].forEach(coord=>{ ws.getCell(coord).border = b3Border; });
 
     const buf = await wb.xlsx.writeBuffer();
     const fname = (S.meta.title.replace(/[\\/:*?"<>|\s]/g,"") || "会议纪要") + ".xlsx";
