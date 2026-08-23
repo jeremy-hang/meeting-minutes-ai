@@ -52,19 +52,27 @@ body{
   backdrop-filter:saturate(180%) blur(20px);
   -webkit-backdrop-filter:saturate(180%) blur(20px);
 }
+/* logo 同款银灰渐变 hairline——业务光 */
+.topbar::after{
+  content:"";display:block;height:1px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(192,192,200,.4) 20%,
+    rgba(160,160,170,.6) 50%,
+    rgba(192,192,200,.4) 80%,
+    transparent 100%);
+}
 .topbar-inner{
   max-width:1480px;margin:0 auto;
   display:flex;align-items:center;gap:24px;
   height:56px;
 }
 .logo-mark{
-  width:26px;height:26px;flex:none;
-  background:linear-gradient(135deg,var(--brand),var(--brand-strong));
-  border-radius:7px;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 8px var(--brand-glow);
+  width:32px;height:32px;flex:none;
+  border-radius:8px;
+  object-fit:cover;display:block;
+  box-shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.08);
 }
-.logo-mark svg{width:14px;height:14px;stroke:#fff;stroke-width:2.5;fill:none}
 .topbar .brand-name{
   font-size:15px;font-weight:600;letter-spacing:-.01em;color:var(--text);
   display:flex;align-items:center;gap:10px;
@@ -119,6 +127,11 @@ body{
   border-radius:var(--radius-lg);
   padding:18px;
   box-shadow:var(--shadow);
+  transition:box-shadow .2s ease,transform .2s ease;
+}
+.panel:hover{
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.08);
+  transform:translateY(-1px);
 }
 .panel + .panel{margin-top:14px}
 .panel h2{
@@ -387,9 +400,7 @@ footer .sig:hover{color:var(--brand);}
 
 <div class="topbar">
   <div class="topbar-inner">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24"><path d="M5 4h14M5 12h14M5 20h9"/></svg>
-    </div>
+    <img class="logo-mark" src="logo.png" alt="识野 Insight">
     <div class="brand-name">识野 AI 会议纪要<span class="brand-tag">v0.9 · 上传会议转录 · AI 一键生成 · 直接导出标准会议纪要</span></div>
     <div class="spacer"></div>
     <a class="by-credit" href="https://github.com/jeremy-hang/meeting-minutes-ai" target="_blank" rel="noopener" title="GitHub 仓库">by 识野Insight</a>
