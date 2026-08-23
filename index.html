@@ -434,6 +434,10 @@ footer .sig{
             <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
             复制 Cloudflare Worker 代理代码（免费部署）
           </button>
+          <button class="btn btn-ghost" id="saveProxyDefaultBtn" style="width:100%;margin-top:8px;font-size:12px;padding:7px 12px">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+            存为内置默认（改源码常量，重启页面仍保留）
+          </button>
         </div>
         <div class="proxy-note">
           <b>自动</b>（默认推荐）：先直连，被拦依次走 5 个公共代理<br>
@@ -647,7 +651,12 @@ $("proxyDirect").onclick = () => setProxyTab("direct");
 $("proxyCors").onclick = () => setProxyTab("cors");
 $("proxyCustom").onclick = () => setProxyTab("custom");
 setProxyTab(proxyMode);
-$("customProxyUrl").value = LS("customProxyUrl");
+
+/* 内置默认自有代理地址（可改 / 可覆盖）
+ * 想做成"内置"：把下面这行改成你自己的 Worker 地址，部署后别人拿到即自带代理
+ * 只改这里即可，用户端不填地址也能直接用「自有代理」模式 */
+const DEFAULT_CUSTOM_PROXY = ""; // 例："https://my-cors-proxy.your-subdomain.workers.dev/?target="
+$("customProxyUrl").value = LS("customProxyUrl") || DEFAULT_CUSTOM_PROXY;
 $("customProxyUrl").oninput = () => setLS("customProxyUrl", $("customProxyUrl").value);
 
 /* Cloudflare Worker 代理代码模板 */
@@ -703,6 +712,20 @@ $("copyWorkerBtn").onclick = () => {
       $("copyWorkerBtn").innerHTML = `<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> 复制 Cloudflare Worker 代理代码（免费部署）`;
     }, 2000);
   });
+};
+
+/* 存为内置默认：把当前输入的内置地址写进源码常量（调 build_script 重新生成即可永久内置）
+ * 这个按钮做"当前浏览器会话记住"，真正"内置到源码"由 build 脚本占位符替换完成 */
+$("saveProxyDefaultBtn").onclick = () => {
+  const v = $("customProxyUrl").value.trim();
+  if (!v){ alert("先在上方填入你的代理地址"); return; }
+  setLS("customProxyUrl", v);
+  setLS("proxyBuiltin", "1"); // 标记已存为内置
+  const btn = $("saveProxyDefaultBtn");
+  btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> 已保存为默认`;
+  setTimeout(()=>{
+    btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> 存为内置默认（改源码常量，重启页面仍保留）`;
+  }, 2000);
 };
 
 /* preset 按钮 */
